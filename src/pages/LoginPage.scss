@@ -1,0 +1,72 @@
+@import "../colors.scss";
+
+.login-page {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+.login-form {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: min(80vw, 300px);
+  height: 50vh;
+  background-color: $primary-color;
+  border-radius: 20px;
+  box-shadow: 5px 5px 5px rgba(0, 0, 0, 0.1);
+  h1 {
+    text-align: center;
+    margin-bottom: 25px;
+    text-transform: uppercase;
+    color: $secondary-color;
+    letter-spacing: 5px;
+  }
+  p {
+    text-align: center;
+    margin-bottom: 25px;
+    text-transform: uppercase;
+    color: $primary-color;
+    text-shadow: 2px 2px #d3b7d8;
+  }
+  input {
+    background-color: transparent;
+    width: 70%;
+    color: $secondary-color;
+    border: none;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.673);
+    padding: 10px 0;
+    text-indent: 10px;
+    margin: 8px 0;
+    font-size: 15px;
+    letter-spacing: 2px;
+  }
+  input::placeholder {
+    color: $secondary-color;
+  }
+  input:focus {
+    color: $secondary-color;
+    outline: none;
+    border-bottom: 1px solid #ff5a7684;
+    transition: 0.5s;
+  }
+  button {
+    width: 70%;
+    margin-top: 35px;
+    background-color: #f6f6f6;
+    outline: none;
+    border-radius: 8px;
+    padding: 13px;
+    color: $primary-color;
+    letter-spacing: 2px;
+    border: none;
+    cursor: pointer;
+    font-size: 15px;
+    transition: 0.5s;
+  }
+  button:hover {
+    box-shadow: 5px 5px 5px rgba(0, 0, 0, 0.1);
+  }
+}

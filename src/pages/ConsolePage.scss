@@ -1,0 +1,129 @@
+@import "../colors.scss";
+
+.console-page {
+  display: flex;
+  height: 100vh;
+  align-items: center;
+  flex-direction: column;
+}
+
+.player-button {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+}
+
+.player-button button {
+  aspect-ratio: 1;
+  width: 50px;
+  border-radius: 50%;
+  border: none;
+  background-color: $primary-color;
+  color: $secondary-color;
+  margin: 5px;
+}
+
+button i {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.program-console-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 35vh;
+  width: 70vw;
+  background-color: $secondary-color;
+  border-radius: 20px;
+  margin-top: 1vh;
+  box-shadow: 5px 5px 5px rgba(0, 0, 0, 0.1);
+  overflow: scroll;
+
+  #info{
+    margin-top: 20px;
+    font-size: large;
+    font-family: "Gill Sans", "Gill Sans MT", Calibri, "Trebuchet MS", sans-serif;
+    color: $primary-color;
+  }
+
+  .offline-container{
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    button{
+      margin-top: 10px;
+      height: 30px;
+      width: 80%;
+      border-radius: 10px;
+      padding: 5px;
+      border: none;
+      color: $secondary-color;
+      background-color: $primary-color;
+      font-family: Impact, Haettenschweiler, "Arial Narrow Bold", sans-serif;
+      letter-spacing: 1px;
+    }
+    button:hover{
+      box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.2);
+    }
+  }
+}
+
+.program-console-unit {
+  flex-shrink: 0;
+  height: 20%;
+  width: 90%;
+  border: transparent;
+  border-radius: 20px;
+  transition: 0.5s;
+  display: flex;
+  align-items: center;
+  justify-items: center;
+  padding-inline: 10px;
+  font-family: Georgia, "Times New Roman", Times, serif;
+
+  .program-index {
+    aspect-ratio: 1;
+    background-color: $secondary-color;
+    border: none;
+    border-radius: 25%;
+    height: 60%;
+    margin-right: 10px;
+    font-family: Georgia, "Times New Roman", Times, serif;
+    transition: 0.5s;
+  }
+
+  .program-index:hover {
+    color: $primary-color;
+  }
+
+  .program-index:disabled {
+    color: $primary-color;
+  }
+
+  .program-console-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 15px;
+  }
+
+  .program-console-info {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 10px;
+  }
+}
+
+.program-console-unit:hover {
+  background-color: $primary-color;
+}
+
+.program-console-unit.active {
+  background-color: $primary-color;
+}

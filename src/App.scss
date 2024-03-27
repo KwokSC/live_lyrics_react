@@ -1,0 +1,95 @@
+@import './colors.scss';
+
+* {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  width: 100%;
+  height: 100vh;
+  background: linear-gradient(200deg, #f3e7e9, #e3eeff);
+  overflow: hidden;
+}
+
+::-webkit-scrollbar {
+  display: none;
+}
+
+.error-area {
+  background-color: transparent;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 100;
+}
+
+.error-content {
+  width: 100%;
+  background-color: $primary-color;
+  color: $secondary-color;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding-block: 5px;
+  margin-bottom: 2px;
+  pointer-events: auto;
+  animation: fade-in-out 3s ease-in-out forwards;
+}
+
+@keyframes fade-in-out {
+  0% {
+    opacity: 0;
+  }
+
+  20% {
+    opacity: 1;
+  }
+
+  80% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0;
+  }
+}
+
+.error-content p {
+  font-size: 15px;
+  font-family: "Trebuchet MS", "Lucida Sans Unicode", "Lucida Grande",
+    "Lucida Sans", Arial, sans-serif;
+  text-transform: capitalize;
+  text-align: center;
+  letter-spacing: 1px;
+}
+
+.error-content button {
+  padding: 3px 2px 3px 2px;
+  font-size: 15px;
+  font-family: "Trebuchet MS", "Lucida Sans Unicode", "Lucida Grande",
+    "Lucida Sans", Arial, sans-serif;
+  letter-spacing: 1px;
+  border: 1px solid $secondary-color;
+  border-radius: 5px;
+  background-color: $secondary-color;
+  color: $primary-color;
+}
+
+.error-content button:hover {
+  background-color: $primary-color;
+  color: $secondary-color;
+  transition: background-color 0.2s ease-in-out color 0.2s ease-in-out;
+}
+
+.not-found-page{
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}

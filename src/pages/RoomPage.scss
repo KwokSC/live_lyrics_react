@@ -1,0 +1,339 @@
+@import "../colors.scss";
+
+.room-page {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.head-bar {
+  width: 100%;
+  height: 8vh;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  background-color: $secondary-color;
+  z-index: 2;
+  p {
+    flex: 1;
+    text-align: center;
+    color: $primary-color;
+    letter-spacing: 1px;
+    font-family: Impact, Haettenschweiler, "Arial Narrow Bold", sans-serif;
+    text-transform: uppercase;
+  }
+  button {
+    border: none;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    aspect-ratio: 1;
+    height: 8vh;
+    border-radius: 1vh;
+    background-color: $secondary-color;
+    cursor: pointer;
+    color: $primary-color;
+  }
+
+  i {
+    font-size: 200%;
+  }
+
+  .menu-toggle span {
+    position: absolute;
+    aspect-ratio: 10;
+    width: 4vh;
+    background: $primary-color;
+    border-radius: 1vh;
+    transition: 0.5s;
+  }
+  .menu-toggle span:nth-child(1) {
+    transform: translateY(-1vh);
+  }
+
+  .menu-toggle span:nth-child(3) {
+    transform: translateY(1vh);
+  }
+
+  .menu-toggle.active span:nth-child(1) {
+    transform: rotate(45deg);
+  }
+
+  .menu-toggle.active span:nth-child(2) {
+    transform: scale(0);
+  }
+
+  .menu-toggle.active span:nth-child(3) {
+    transform: rotate(-45deg);
+  }
+}
+
+.nav-bar {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: absolute;
+  top: 8vh;
+  left: 0;
+  width: fit-content;
+  height: 100%;
+  background-color: white;
+  transition: 0.5s;
+  box-shadow: 1px 1px 1px rgba(0, 0, 0, 0.1);
+  z-index: 2;
+  .nav-item {
+    border: none;
+    aspect-ratio: 5;
+    height: 5vh;
+    background-color: white;
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: $primary-color;
+  }
+}
+
+.nav-bar.hidden {
+  transform: translateX(-50vh);
+}
+
+.song-wrapper {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  p,
+  h2 {
+    color: $primary-color;
+    letter-spacing: 1px;
+    text-transform: capitalize;
+  }
+  .album-wrapper {
+    position: relative;
+    aspect-ratio: 1;
+    margin-top: 2vh;
+    margin-bottom: 2vh;
+    width: 30vh;
+    border: none;
+    border-radius: 2vh;
+    box-shadow: 5px 5px 5px rgba(0, 0, 0, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: $primary-color;
+    background-color: $secondary-color;
+    i,
+    img {
+      width: 100%;
+      height: 100%;
+      border-radius: 2vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    i::before {
+      font-size: min(250px, 20vh);
+    }
+  }
+}
+
+.lyric-wrapper {
+  display: flex;
+  flex-direction: column;
+  width: 70vw;
+  height: 40vh;
+  background-color: transparent;
+  overflow: hidden;
+  border-radius: 20px;
+  justify-content: center;
+  align-items: center;
+  margin-block: 2vh;
+  .lyric-content {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    transition: 0.5s;
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: safe center;
+    overflow: scroll;
+    li {
+      text-shadow: 1px 1px 10px rgba(128, 128, 128, 0.5);
+      text-align: center;
+      font-size: 2vh;
+      margin-block: 5px;
+      color: $secondary-color;
+      transition: 0.5s;
+    }
+    li.highlight {
+      width: 100%;
+      font-size: 2.5vh;
+      color: $primary-color;
+      background-image: linear-gradient(
+        to left,
+        transparent,
+        $secondary-color,
+        $secondary-color,
+        transparent
+      );
+    }
+  }
+}
+
+.lang-bar {
+  display: flex;
+  flex-direction: column;
+  position: absolute;
+  bottom: 6vh;
+  right: 14vw;
+  button {
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    font-size: 15px;
+    height: 40px;
+    width: 40px;
+    border-radius: 10px;
+    border: none;
+    background-color: $secondary-color;
+    color: $primary-color;
+    transition: opacity 0.3s ease;
+  }
+  button:hover {
+    color: $secondary-color;
+    background-color: $primary-color;
+    cursor: pointer;
+  }
+}
+
+.lang-selector {
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  font-size: 15px;
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: 60px;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  background-color: $secondary-color;
+  transition: opacity 0.3s ease;
+  li {
+    border-radius: 10px;
+    color: $primary-color;
+    text-align: center;
+    width: 100%;
+    line-height: 40px;
+    transition: 0.5s;
+  }
+  li:hover {
+    cursor: pointer;
+    color: $secondary-color;
+    background-color: $primary-color;
+  }
+}
+
+.recommendation {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  padding-block: 10px;
+  width: 100%;
+  height: 60vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  border-top-left-radius: 30px;
+  border-top-right-radius: 30px;
+  transition: 0.5s;
+  background-color: $secondary-color;
+  box-shadow: 5px 5px 5px rgba(0, 0, 0, 0.1);
+  z-index: 2;
+  button {
+    display: flex;
+    width: 30%;
+    justify-content: center;
+    align-items: center;
+    border: none;
+    background-color: transparent;
+    color: $primary-color;
+    font-size: 20px;
+    font-weight: bold;
+  }
+  .content {
+    width: 90%;
+    height: 100%;
+    overflow: scroll;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .recommend-unit {
+    width: 95%;
+    border-radius: 20px;
+    margin-block: 10px;
+    flex-shrink: 0;
+    box-shadow: 2px 2px 5px 5px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    * {
+      margin-block: 5%;
+      text-indent: 5%;
+      font-family: "Lucida Sans", "Lucida Sans Regular", "Lucida Grande",
+        "Lucida Sans Unicode", Geneva, Verdana, sans-serif;
+    }
+  }
+}
+
+.recommendation.hidden {
+  transform: translateY(58.5vh);
+}
+
+.player-wrapper {
+  width: 70vw;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.player-seekbar {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  height: 2vh;
+  width: 70vw;
+  margin-block: 10px;
+  input[type="range"] {
+    width: 80%;
+    height: 10px;
+    appearance: none;
+    background: $secondary-color;
+    border-radius: 5px;
+    margin-inline: 10px;
+    outline: none;
+    cursor: pointer;
+    overflow: hidden;
+    box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.1);
+  }
+  input[type="range"]::-webkit-slider-thumb {
+    appearance: none;
+    background: $primary-color;
+    height: 10px;
+    width: 10px;
+    border-radius: 50%;
+    box-shadow: -100vw 0 0 99vw $primary-color;
+  }
+  span {
+    width: 10%;
+    color: $primary-color;
+    font-family: Impact, Haettenschweiler, "Arial Narrow Bold", sans-serif;
+    letter-spacing: 1px;
+    text-shadow: 2px 2px 2px rgba(0, 0, 0, 0.1);
+  }
+}

@@ -1,0 +1,27 @@
+@import "../colors.scss";
+
+.explore-page{
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.room-container{
+    position: relative;
+    height: 100vh;
+    overflow: scroll;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 20px;
+    .room-display{
+        margin-block: 10px;
+        flex-shrink: 0;
+        border-radius: 20px;
+        background-color: $secondary-color;
+        width: 90%;
+        height: 30%;
+        box-shadow: 5px 5px 5px rgba(0, 0, 0, 0.1);
+    }
+}

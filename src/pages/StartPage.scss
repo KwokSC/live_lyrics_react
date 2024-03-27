@@ -1,0 +1,74 @@
+@import '../colors.scss';
+
+.start-page{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+}
+
+.room-form{
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    padding: 5% 5px;
+    align-items: center;
+    width: min(85vw, 500px);
+    height: 80vh;
+    background-color: $primary-color;
+    border-radius: 20px;
+    box-shadow: 5px 5px 5px rgba(0, 0, 0, 0.1);
+    h1{
+        text-transform: capitalize;
+        font-family:Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+        color: $secondary-color;
+        margin-bottom: 5%;
+    }
+    p{
+        width: 70%;
+        text-align: center;
+        margin-block: 10px;
+        text-transform: uppercase;
+        background-color: $secondary-color;
+        color: $primary-color;
+    }
+    input {
+        background-color: transparent;
+        width: 70%;
+        color: $secondary-color;
+        border: none;
+        border-bottom: 2px solid rgba(255, 255, 255, 0.256);
+        padding: 10px 0;
+        text-indent: 10px;
+        margin: 8px 0;
+        font-size: 15px;
+        letter-spacing: 2px;
+        transition: 0.5s;
+      }
+      input::placeholder {
+        color: $secondary-color;
+      }
+      input:focus {
+        color: $secondary-color;
+        outline: none;
+        border-bottom: 2px solid $secondary-color;
+      }
+      button {
+        position: absolute;
+        width: 70%;
+        bottom: 5%;
+        background-color: #f6f6f6;
+        outline: none;
+        border-radius: 8px;
+        padding: 13px;
+        color: $primary-color;
+        letter-spacing: 2px;
+        border: none;
+        cursor: pointer;
+        font-size: 15px;
+        transition: 0.5s;
+      }
+      button:hover {
+        box-shadow: 5px 5px 5px rgba(0, 0, 0, 0.1);
+      }
+}

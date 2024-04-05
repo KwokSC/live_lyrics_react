@@ -6,12 +6,12 @@ import { GlobalErrorProvider } from "./components/GlobalErrorContext";
 import GlobalErrorModal from "./components/GlobalErrorModal";
 
 ReactDOM.createRoot(document.getElementById('root')).render(
-  <React.StrictMode>
+  // <React.StrictMode>
   <GlobalErrorProvider>
     <GlobalErrorModal />
     <BrowserRouter>
       <App />
     </BrowserRouter>
   </GlobalErrorProvider>
-  </React.StrictMode>
+  // </React.StrictMode>
 );

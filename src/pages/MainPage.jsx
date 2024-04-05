@@ -26,7 +26,13 @@ export default function MainPage() {
             >
               Explore
             </button>
-            <button>Join</button>
+            <button
+              onClick={() => {
+                navigate("/login");
+              }}
+            >
+              Login
+            </button>
           </div>
           <div className="social-buttons">
             <a

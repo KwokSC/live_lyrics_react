@@ -22,7 +22,9 @@ export default function ConsolePage() {
   const GlobalErrorContext = useRef(useGlobalError());
   const [roomId, setRoomId] = useState(null);
   const [roomTitle, setTitle] = useState("Room");
+  const [roomOwner, setOwner] = useState("Unknown");
   const [isOnline, setIsOnline] = useState(false);
+  const [users, setUsers] = useState([]);
   const [navState, setNavState] = useState(false);
   const [programList, setProgramList] = useState([]);
   const [stompClient, setStompClient] = useState(null);
@@ -72,6 +74,11 @@ export default function ConsolePage() {
   function onMessageReceived(message) {
     const response = JSON.parse(message.body);
     console.log(response);
+    if (response.type === "USER ENTER") {
+      setUsers(response.data.users);
+    } else if (response.type === "USER EXIT") {
+    } else if (response.type === "CHAT") {
+    }
   }
 
   function startLive() {
@@ -80,13 +87,6 @@ export default function ConsolePage() {
       .then((response) => {
         if (response.data.code === 200) {
           setIsOnline(true);
-          stompClient.subscribe(
-            `/topic/${roomId}/public`,
-            (message) => onMessageReceived(message),
-            {
-              UserId: getUserInfo().userAccount,
-            }
-          );
         }
       })
       .catch((error) => {
@@ -144,9 +144,8 @@ export default function ConsolePage() {
   }
 
   function handlePlayAt(songId) {
-    setCurrentSong(songId);
-    // TODO:
-    updatePlayStatus(songId, 0, false);
+    // setCurrentSong(songId);
+    // updatePlayStatus(songId, 0, false);
   }
 
   function getProgrammeById(roomId) {
@@ -162,6 +161,25 @@ export default function ConsolePage() {
       })
       .catch((error) => {
         console.error(error);
+      });
+  }
+
+  function getRoomByRoomId(roomId) {
+    base
+      .get("/room/getRoomByRoomId", { params: { roomId: roomId } })
+      .then((response) => {
+        if (response.data.data) {
+          setTitle(response.data.data.roomTitle);
+          setOwner(response.data.data.roomOwner);
+        } else {
+          navigate("*");
+        }
+      })
+      .catch((error) => {
+        console.error(error);
+        GlobalErrorContext.current.addErrorMsg(
+          "Server error, please try again later."
+        );
       });
   }
 
@@ -190,11 +208,34 @@ export default function ConsolePage() {
         const newRoomStatus = response.data.data;
         if (newRoomStatus) {
           setIsOnline(newRoomStatus.isOnline);
+          setUsers(newRoomStatus.users);
         }
       })
       .catch((error) => {
         console.error(error);
       });
+  }
+
+  function connectToRoom() {
+    const client = connectToSockJs();
+    client.onConnect = (frame) => {
+      console.log(frame);
+      setStompClient(client);
+      client.subscribe(
+        `/topic/${roomId}/public`,
+        (message) => onMessageReceived(message),
+        {
+          UserId: getUserInfo().userAccount,
+        }
+      );
+      client.publish({
+        destination: `/app/${roomId}/user.enter`,
+        headers: {
+          UserId: getUserInfo().userAccount,
+        },
+      });
+    };
+    client.activate();
   }
 
   // The first time the console page is opened, it check if user is login
@@ -207,23 +248,16 @@ export default function ConsolePage() {
       getRoomByUserId();
     }
 
-    connectToSockJs("", getUserInfo().userAccount)
-      .then((client) => {
-        setStompClient(client);
-        console.log("Connected");
-      })
-      .catch((error) => {
-        console.error(error);
-        GlobalErrorContext.current.addErrorMsg("Fail to connect to the room.");
-      });
-
     return () => {
       if (stompClient) {
         console.log("Sock Client disconnects.");
-        stompClient.send(`/${roomId}/user.exit`, {
-          UserId: getUserInfo().userAccount,
+        stompClient.publish({
+          destination: `/app/${roomId}/user.exit`,
+          headers: {
+            UserId: getUserInfo().userAccount,
+          },
         });
-        stompClient.disconnect();
+        stompClient.deactivate();
       }
     };
     // eslint-disable-next-line
@@ -233,10 +267,17 @@ export default function ConsolePage() {
     if (!roomId) {
       return;
     }
+    getRoomByRoomId(roomId);
     getProgrammeById(roomId);
     getPlayStatusById(roomId);
     getRoomStatusById(roomId);
   }, [roomId]);
+
+  useEffect(() => {
+    if (isOnline) {
+      connectToRoom();
+    }
+  }, [isOnline]);
 
   useEffect(() => {
     if (!currentSong) {

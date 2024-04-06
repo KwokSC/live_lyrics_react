@@ -1,8 +1,10 @@
 import axios from "axios";
 import { getAuthToken, isAuthenticated, removeAuthToken, removeUserInfo } from "../utils/cookie";
 
+const baseURL = "http://" + process.env.BACKEND_DOMAIN || "http://localhost:8080";
+
 const api = axios.create({
-  baseURL: "http://localhost:8080/",
+  baseURL: baseURL,
 });
 
 api.interceptors.request.use((config) => {

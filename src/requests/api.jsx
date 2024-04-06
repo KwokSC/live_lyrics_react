@@ -1,7 +1,6 @@
 import axios from "axios";
 import { getAuthToken, isAuthenticated, removeAuthToken, removeUserInfo } from "../utils/cookie";
 
-
 const api = axios.create({
   baseURL: "http://localhost:8080/",
 });

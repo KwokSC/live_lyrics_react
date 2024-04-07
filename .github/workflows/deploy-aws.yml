@@ -22,9 +22,9 @@ jobs:
         run: npm install
 
       - name: Set environment variable for baseURL
+        run: echo Hello world $FIRST_NAME $middle_name $Last_Name! ${{ secrets.EB_ENDPOINT }}
         env:
-          BACKEND_DOMAIN: Busklive-spring-boot-env.eba-xvcjza47.ap-southeast-2.elasticbeanstalk.com
-        run: echo "BACKEND_DOMAIN=$BACKEND_DOMAIN" >> $GITHUB_ENV
+          EB_ENDPOINT: ${{ secrets.EB_ENDPOINT }}
 
       - name: Build app
         run: npm run build

@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const baseURL = "http://" + process.env.BACKEND_DOMAIN || "http://localhost:8080";
+const baseURL = "http://" + process.env.EB_ENDPOINT || "http://localhost:8080";
 
 const base = axios.create({
     baseURL: baseURL,

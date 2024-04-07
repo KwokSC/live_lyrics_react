@@ -117,7 +117,6 @@ export default function AddProgramPage() {
       }
     });
 
-
     recommendationList.forEach((item) => {
       if (item.type === "" && item.content !== "") {
         addErrorMsg("Please specify the type for each recommendation content.");

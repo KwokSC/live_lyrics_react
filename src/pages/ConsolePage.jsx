@@ -154,9 +154,9 @@ export default function ConsolePage() {
         params: { roomId: roomId },
       })
       .then((response) => {
-        const programListRes = response.data.data.programList;
-        if (programListRes) {
-          setProgramList(programListRes);
+        const res = response.data.data;
+        if (res) {
+          setProgramList(res.programListRes);
         }
       })
       .catch((error) => {

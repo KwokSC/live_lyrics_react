@@ -1,6 +1,7 @@
 import { Client } from "@stomp/stompjs";
 
-const brokerURL = "ws://" + process.env.EB_ENDPOINT + "/ws" || "http://localhost:8080";
+
+const brokerURL = "ws://" + process.env.REACT_APP_ENDPOINT + "/ws";
 
 const connectToSockJs = () => {
 

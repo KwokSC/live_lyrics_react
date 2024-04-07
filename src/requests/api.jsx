@@ -1,7 +1,12 @@
 import axios from "axios";
-import { getAuthToken, isAuthenticated, removeAuthToken, removeUserInfo } from "../utils/cookie";
+import {
+  getAuthToken,
+  isAuthenticated,
+  removeAuthToken,
+  removeUserInfo,
+} from "../utils/cookie";
 
-const baseURL = "http://" + process.env.EB_ENDPOINT || "http://localhost:8080";
+const baseURL = "http://" + process.env.REACT_APP_ENDPOINT;
 
 const api = axios.create({
   baseURL: baseURL,
@@ -18,11 +23,11 @@ api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response && error.response.status === 401) {
-      removeAuthToken()
-      removeUserInfo()
+      removeAuthToken();
+      removeUserInfo();
       window.location.href = "/login";
     }
-    return Promise.reject(error)
+    return Promise.reject(error);
   }
 );
 

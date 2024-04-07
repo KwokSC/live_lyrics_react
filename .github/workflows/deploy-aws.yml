@@ -20,12 +20,7 @@ jobs:
 
       - name: Install dependencies
         run: npm install
-
-      - name: Set environment variable for baseURL
-        run: echo Hello world $FIRST_NAME $middle_name $Last_Name! ${{ secrets.EB_ENDPOINT }}
-        env:
-          EB_ENDPOINT: ${{ secrets.EB_ENDPOINT }}
-
+        
       - name: Build app
         run: npm run build
 

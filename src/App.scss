@@ -27,19 +27,43 @@ body {
   justify-content: center;
   align-items: center;
   z-index: 100;
-}
-
-.error-content {
-  width: 100%;
-  background-color: $primary-color;
-  color: $secondary-color;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding-block: 5px;
-  margin-bottom: 2px;
-  pointer-events: auto;
-  animation: fade-in-out 3s ease-in-out forwards;
+  .error-content {
+    width: 100%;
+    background-color: $primary-color;
+    color: $secondary-color;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding-block: 5px;
+    margin-bottom: 2px;
+    pointer-events: auto;
+    animation: fade-in-out 3s ease-in-out forwards;
+    p {
+      font-size: 15px;
+      font-family: "Trebuchet MS", "Lucida Sans Unicode", "Lucida Grande",
+        "Lucida Sans", Arial, sans-serif;
+      text-transform: capitalize;
+      text-align: center;
+      letter-spacing: 1px;
+    }
+    button {
+      padding: 3px 2px 3px 2px;
+      font-size: 15px;
+      font-family: "Trebuchet MS", "Lucida Sans Unicode", "Lucida Grande",
+        "Lucida Sans", Arial, sans-serif;
+      letter-spacing: 1px;
+      border: 1px solid $secondary-color;
+      border-radius: 5px;
+      background-color: $secondary-color;
+      color: $primary-color;
+    }
+    button:hover {
+      background-color: $primary-color;
+      color: $secondary-color;
+      transition: background-color 0.2s ease-in-out color 0.2s ease-in-out;
+    }
+  }
+  
 }
 
 @keyframes fade-in-out {
@@ -60,36 +84,101 @@ body {
   }
 }
 
-.error-content p {
-  font-size: 15px;
-  font-family: "Trebuchet MS", "Lucida Sans Unicode", "Lucida Grande",
-    "Lucida Sans", Arial, sans-serif;
-  text-transform: capitalize;
-  text-align: center;
-  letter-spacing: 1px;
-}
-
-.error-content button {
-  padding: 3px 2px 3px 2px;
-  font-size: 15px;
-  font-family: "Trebuchet MS", "Lucida Sans Unicode", "Lucida Grande",
-    "Lucida Sans", Arial, sans-serif;
-  letter-spacing: 1px;
-  border: 1px solid $secondary-color;
-  border-radius: 5px;
-  background-color: $secondary-color;
-  color: $primary-color;
-}
-
-.error-content button:hover {
-  background-color: $primary-color;
-  color: $secondary-color;
-  transition: background-color 0.2s ease-in-out color 0.2s ease-in-out;
-}
-
 .not-found-page{
   height: 100vh;
   display: flex;
   justify-content: center;
   align-items: center;
+}
+
+.head-bar {
+  width: 100%;
+  height: 8vh;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  background-color: $secondary-color;
+  z-index: 2;
+  p {
+    flex: 1;
+    text-align: center;
+    color: $primary-color;
+    letter-spacing: 1px;
+    font-family: Impact, Haettenschweiler, "Arial Narrow Bold", sans-serif;
+    text-transform: uppercase;
+  }
+  button {
+    border: none;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    aspect-ratio: 1;
+    height: 8vh;
+    border-radius: 1vh;
+    background-color: $secondary-color;
+    cursor: pointer;
+    color: $primary-color;
+  }
+
+  i {
+    font-size: 200%;
+  }
+
+  .menu-toggle span {
+    position: absolute;
+    aspect-ratio: 10;
+    width: 4vh;
+    background: $primary-color;
+    border-radius: 1vh;
+    transition: 0.5s;
+  }
+  .menu-toggle span:nth-child(1) {
+    transform: translateY(-1vh);
+  }
+
+  .menu-toggle span:nth-child(3) {
+    transform: translateY(1vh);
+  }
+
+  .menu-toggle.active span:nth-child(1) {
+    transform: rotate(45deg);
+  }
+
+  .menu-toggle.active span:nth-child(2) {
+    transform: scale(0);
+  }
+
+  .menu-toggle.active span:nth-child(3) {
+    transform: rotate(-45deg);
+  }
+}
+
+.nav-bar {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: absolute;
+  top: 8vh;
+  left: 0;
+  width: fit-content;
+  height: 100%;
+  background-color: white;
+  transition: 0.5s;
+  box-shadow: 1px 1px 1px rgba(0, 0, 0, 0.1);
+  z-index: 2;
+  .nav-item {
+    border: none;
+    aspect-ratio: 5;
+    height: 5vh;
+    background-color: white;
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: $primary-color;
+  }
+}
+
+.nav-bar.hidden {
+  transform: translateX(-50vh);
 }

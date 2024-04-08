@@ -1,12 +1,14 @@
+import "./ConsolePage.scss";
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import HeadBar from "../components/HeadBar.jsx";
+import Overlay from "../components/Overlay.jsx";
+import NavBar from "../components/NavBar.jsx";
 import Player from "../components/Player.jsx";
-import "./ConsolePage.scss";
-import connectToSockJs from "../requests/socket.jsx";
 import Lyric from "../components/Lyric.jsx";
+import ProgramConsoleUnit from "../components/ProgramConsoleUnit.jsx";
 import { PlayerContextProvider } from "../components/PlayerContext.jsx";
 import { useGlobalError } from "../components/GlobalErrorContext.jsx";
-import ProgramConsoleUnit from "../components/ProgramConsoleUnit.jsx";
 import {
   isAuthenticated,
   removeAuthToken,
@@ -14,6 +16,7 @@ import {
   storeRoomId,
   getUserInfo,
 } from "../utils/cookie.jsx";
+import connectToSockJs from "../requests/socket.jsx";
 import base from "../requests/base.jsx";
 import api from "../requests/api.jsx";
 
@@ -31,6 +34,11 @@ export default function ConsolePage() {
   const [currentSong, setCurrentSong] = useState(null);
   const [audio, setAudio] = useState(null);
   const [lyric, setLyric] = useState([]);
+
+  const navItemList = [
+    { text: "Profile", onClick: null },
+    { text: "Preferences", onClick: null },
+  ];
 
   const ConsoleDisplay = () => {
     if (!isOnline) {
@@ -309,30 +317,24 @@ export default function ConsolePage() {
   return (
     <PlayerContextProvider>
       <div className="console-page">
-        <div
-          className="overlay"
-          style={{ display: navState ? "" : "none" }}
-          onClick={() => setNavState(false)}
-        ></div>
-        <div className="head-bar">
-          <button
-            className={`menu-toggle ${navState ? "active" : ""}`}
-            onClick={() => setNavState(!navState)}
-          >
-            <span />
-            <span />
-            <span />
-          </button>
-          <p className="room-title">{roomTitle}</p>
-          <button onClick={() => navigate("/program")}>
-            <i className="fi fi-sr-album"></i>
-          </button>
-        </div>
-        <div className={`nav-bar ${navState ? "active" : "hidden"}`}>
-          <button className="nav-item">Profile</button>
-          <button className="nav-item">Preferences</button>
-          <button className="nav-item">Logout</button>
-        </div>
+        <Overlay
+          isCovered={navState}
+          onClick={() => {
+            setNavState(false);
+          }}
+        />
+        <HeadBar
+          navState={navState}
+          handleNavClick={() => {
+            setNavState(!navState);
+          }}
+          displayText={roomTitle}
+          handleBtnClick={()=>{
+            navigate("/program")
+          }}
+          buttonIcon={<i className="fi fi-sr-album"></i>}
+        />
+        <NavBar navState={navState} navItemList={navItemList} />
         <div className="program-console-container">{ConsoleDisplay()}</div>
         <Player audio={audio} isSeekable={true} />
         <Lyric lyric={lyric} />

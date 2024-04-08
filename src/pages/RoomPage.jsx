@@ -1,4 +1,8 @@
 import "./RoomPage.scss";
+import NavBar from "../components/NavBar.jsx";
+import Overlay from "../components/Overlay.jsx";
+import HeadBar from "../components/HeadBar.jsx";
+import HostInfo from "../components/HostInfo.jsx";
 import SeekBar from "../components/SeekBar.jsx";
 import Lyric from "../components/Lyric.jsx";
 import SongInfo from "../components/SongInfo.jsx";
@@ -15,17 +19,27 @@ import {
 } from "../utils/cookie.jsx";
 import connectToSockJs from "../requests/socket.jsx";
 import base from "../requests/base.jsx";
+import DonationWindow from "../components/DonationWindow.jsx";
 
 export default function RoomPage() {
   const navigate = useNavigate();
   const { roomId } = useParams();
   const GlobalErrorContext = useRef(useGlobalError());
-  const [roomTitle, setTitle] = useState("Room");
-  const [roomOwner, setOwner] = useState("Unknown");
-  const [isOline, setIsOnline] = useState(false);
-  const [users, setUsers] = useState([]);
+
   const [navState, setNavState] = useState(false);
   const [reState, setReState] = useState(false);
+  const [hoState, setHoState] = useState(false);
+  const [doState, setDoState] = useState(false);
+
+  const [roomTitle, setTitle] = useState("Room");
+  const [roomOwner, setOwner] = useState("Unknown");
+  const [hostInfo, setHostInfo] = useState({
+    userAccount: "Unknown",
+    userName: "Unknown",
+    summary: "N/A"
+  })
+  const [isOline, setIsOnline] = useState(false);
+  const [users, setUsers] = useState([]);
   const [songInfo, setSongInfo] = useState({
     songName: "unknown",
     songArtist: "unknown",
@@ -40,6 +54,13 @@ export default function RoomPage() {
   const [currentTime, setCurrentTime] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
 
+  const navItemList = [
+    { text: "Explore", onClick: null },
+    { text: "Following", onClick: null },
+    { text: "Payment", onClick: null },
+    { text: "Preferences", onClick: null },
+  ];
+
   // The websocket connection subscribed /playStatus callback function
   function onMessageReceived(message) {
     const response = JSON.parse(message.body);
@@ -49,7 +70,7 @@ export default function RoomPage() {
     } else if (response.type === "PLAYER") {
       handlePlayerStatusChange(response.data);
     } else if (response.type === "USER ENTER") {
-      setUsers(response.data.users)
+      setUsers(response.data.users);
     } else if (response.type === "USER EXIT") {
     } else if (response.type === "CHAT") {
     }
@@ -253,6 +274,7 @@ export default function RoomPage() {
         songAlbum: "unknown",
         songDuration: 0,
       });
+      setUrl(null);
       setCurrentTime(0);
       setIsPlaying(false);
       setLyric([]);
@@ -269,46 +291,37 @@ export default function RoomPage() {
     // eslint-disable-next-line
   }, [isOline]);
 
-  useEffect(()=>{
+  useEffect(() => {
     getRoomByRoomId(roomId);
     getProgrammeById(roomId);
     getPlayStatusById(roomId);
     getRoomStatusById(roomId);
-  },[roomId])
+  }, [roomId]);
 
   return (
     <div className="room-page">
-      <div
-        className="overlay"
-        style={{ display: reState || navState ? "" : "none" }}
+      <Overlay
+        isCovered={navState || reState || doState}
         onClick={() => {
           setNavState(false);
           setReState(false);
+          setDoState(false)
         }}
       />
-      <div className="head-bar">
-        <button
-          className={`menu-toggle ${navState ? "active" : ""}`}
-          onClick={() => {
-            setNavState(!navState);
-          }}
-        >
-          <span />
-          <span />
-          <span />
-        </button>
-        <p className="room-title">{roomTitle}</p>
-        <button>
-          <i className="fi fi-sr-album"></i>
-        </button>
-      </div>
-      <div className={`nav-bar ${navState ? "active" : "hidden"}`}>
-        <button className="nav-item">Explore</button>
-        <button className="nav-item">Following</button>
-        <button className="nav-item">Payment</button>
-        <button className="nav-item">Preferences</button>
-        <button className="nav-item">Exit</button>
-      </div>
+      <HeadBar
+        navState={navState}
+        handleNavClick={() => {
+          setNavState(!navState);
+        }}
+        displayText={roomTitle}
+        handleBtnClick={()=>{
+          setHoState(!hoState)
+        }}
+        buttonIcon={<i class="fi fi-rr-circle-user"></i>}
+      />
+      <NavBar navState={navState} navItemList={navItemList} />
+      <HostInfo hoState={hoState} setDoState={setDoState} hostName={hostInfo.userName} summary={hostInfo.summary}/>
+      <DonationWindow doState={doState} setDoState={setDoState}/>
       <SongInfo songInfo={songInfo} albumCoverURL={albumCoverURL} />
       <SeekBar isSeekable={false} />
       <Lyric lyric={lyric} />

@@ -1,5 +1,6 @@
 import "./MainPage.scss";
 import { useNavigate } from "react-router-dom";
+import HeadBar from "../components/HeadBar";
 
 export default function MainPage() {
   const navigate = useNavigate();
@@ -9,7 +10,7 @@ export default function MainPage() {
       <div className="banner">
         <img src="./images/banner.png" alt="banner"></img>
       </div>
-      <div className="head-bar" />
+      <HeadBar />
       <div className="welcome-container">
         <h1>
           BuskLive - <br /> The busk live enhancement platform

@@ -16,6 +16,8 @@ export default function Player({ isSeekable, audio }) {
 
   function handleReplay() {}
 
+  function handleEndLive() {}
+
   return (
     <div className="player-wrapper">
       <SeekBar
@@ -39,6 +41,9 @@ export default function Player({ isSeekable, audio }) {
         </button>
         <button onClick={handleReplay}>
           <i className="fi fi-br-r"></i>
+        </button>
+        <button onClick={handleEndLive}>
+        <i className="fi fi-sr-exit"></i>
         </button>
       </div>
     </div>

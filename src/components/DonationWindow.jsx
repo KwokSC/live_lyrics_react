@@ -1,13 +1,53 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
+import { useMask } from "@react-input/mask";
+import { useGlobalError } from "../components/GlobalErrorContext.jsx";
 
 export default function DonationWindow({ doState, setDoState }) {
+  const cardMaskRef = useMask({
+    mask: "____ ____ ____ ____",
+    replacement: { _: /\d/ },
+  });
+  const expirtyMaskRef = useMask({ mask: "__/__", replacement: { _: /\d/ } });
+  const cvvMaskRef = useMask({ mask: "___", replacement: { _: /\d/ } });
   const [donationAmount, setAmount] = useState(0);
+  const [amountSelected, setAmountSelected] = useState(null);
   const [cardholderName, setName] = useState("");
-  const [cardNumer, setNumber] = useState("");
-  const [expYear, setYear] = useState(0);
-  const [expMonth, setMonth] = useState(0);
+  const [card, setCard] = useState("");
+  const [expiry, setExpiry] = useState("");
   const [cvv, setCvv] = useState(0);
   const [currentPage, setPage] = useState(0);
+  const GlobalErrorContext = useRef(useGlobalError());
+
+  function handleChangeAmount(type, amount) {
+    setAmountSelected(type);
+    if (amount) {
+      setAmount(amount);
+    }
+  }
+
+  function validateAmountAndJump(page){
+    if (parseInt(donationAmount) > 0) {
+      setPage(page);
+    } else {
+      GlobalErrorContext.current.addErrorMsg(
+        "Please enter a valid donation amount."
+      );
+    }
+  }
+
+  function donate() {
+    const expMonth = expiry.split("/")[0];
+    const expYear = expiry.split("/")[1];
+    const cardNumber = card.replace(/\s/g, "");
+
+    const cardInfo = {
+      cardholderName: cardholderName,
+      cardNumer: cardNumber,
+      expMonth: expMonth,
+      expYear: expYear,
+      cvv: cvv,
+    };
+  }
 
   const buttonContainer = (
     <div className="donation-button-container">
@@ -29,27 +69,52 @@ export default function DonationWindow({ doState, setDoState }) {
         <>
           <p>Thanks for your support</p>
           <div className="amount-selection">
-            <button className={"selected"}>$5</button>
-            <button className={"selected"}>$10</button>
+            <button
+              className={
+                amountSelected === "button" && donationAmount === 5
+                  ? "focus"
+                  : ""
+              }
+              onClick={() => handleChangeAmount("button", 5)}
+            >
+              $5
+            </button>
+            <button
+              className={
+                amountSelected === "button" && donationAmount === 10
+                  ? "focus"
+                  : ""
+              }
+              onClick={() => handleChangeAmount("button", 10)}
+            >
+              $10
+            </button>
             <input
-              inputMode="numeric"
+              className={amountSelected === "input" ? "focus" : ""}
               type="number"
-              onChange={(e) => handleAmountChange(e.target.value)}
+              onClick={(e) => {
+                setAmount(parseInt(e.target.value));
+                handleChangeAmount("input");
+              }}
+              onChange={(e) => setAmount(e.target.value)}
             />
           </div>
           <div className="payment-type-btn">
             <button
-              onClick={() => {
-                setPage(1);
-              }}
+              onClick={()=>validateAmountAndJump(1)}
             >
               <i className="fi fi-rr-credit-card"></i>
             </button>
-            <button style={{ fontSize: "35px" }}>
-              <i class="fi fi-brands-apple-pay"></i>
+            <button
+              style={{ fontSize: "35px" }}
+              onClick={()=>validateAmountAndJump(2)}
+            >
+              <i className="fi fi-brands-apple-pay"></i>
             </button>
-            <button>
-              <i class="fi fi-brands-paypal"></i>
+            <button
+              onClick={()=>validateAmountAndJump(3)}
+            >
+              <i className="fi fi-brands-paypal"></i>
             </button>
           </div>
         </>
@@ -60,19 +125,16 @@ export default function DonationWindow({ doState, setDoState }) {
       content: (
         <>
           <input
-            inputMode="text"
             placeholder="Card Holder Name"
             onChange={(e) => {
               setName(e.target.value);
             }}
           />
           <input
-            inputMode="numeric"
-            type="number"
+            ref={cardMaskRef}
+            value={card}
             placeholder="Card Number"
-            onChange={(e) => {
-              setNumber(e.target.value);
-            }}
+            onChange={(e) => setCard(e.target.value)}
           />
 
           <div
@@ -84,41 +146,17 @@ export default function DonationWindow({ doState, setDoState }) {
               justifyContent: "center",
             }}
           >
-            <span className="expiry-date-input">
-              <input
-                inputMode="numeric"
-                type="number"
-                name="month"
-                placeholder="MM"
-                maxLength={2}
-                size={2}
-                onChange={(e) => {
-                  setMonth(e.target.value);
-                }}
-              />
-              <span>/</span>
-              <input
-                inputMode="numeric"
-                type="number"
-                name="year"
-                placeholder="YY"
-                maxLength={2}
-                size={2}
-                onChange={(e) => {
-                  setYear(e.target.value);
-                }}
-              />
-            </span>
             <input
-              style={{ flex: "1" }}
-              inputMode="numeric"
-              type="number"
-              size={3}
-              maxLength={3}
+              style={{ marginRight: "5px" }}
+              ref={expirtyMaskRef}
+              placeholder="Expiry Date"
+            />
+
+            <input
+              style={{ marginLeft: "5px" }}
+              ref={cvvMaskRef}
               placeholder="CVV"
-              onChange={(e) => {
-                setCvv(e.target.value);
-              }}
+              onChange={(e) => setCvv(e.target.value)}
             />
           </div>
           {buttonContainer}
@@ -130,6 +168,7 @@ export default function DonationWindow({ doState, setDoState }) {
       content: (
         <>
           <p>Waiting for confirmation...</p>
+          <i className="fi fi-rr-loading" style={{ fontSize: "30px" }}></i>
         </>
       ),
     },
@@ -138,6 +177,7 @@ export default function DonationWindow({ doState, setDoState }) {
       content: (
         <>
           <p>Redirect to Paypal...</p>
+          <i className="fi fi-rr-loading" style={{ fontSize: "30px" }}></i>
         </>
       ),
     },
@@ -151,20 +191,6 @@ export default function DonationWindow({ doState, setDoState }) {
     },
   ];
 
-  function handleAmountChange(amount) {
-    setAmount(amount);
-  }
-
-  function donate() {
-    const cardInfo = {
-      cardholderName: cardholderName,
-      cardNumer: cardNumer,
-      expMonth: expMonth,
-      expYear: expYear,
-      cvv: cvv,
-    };
-  }
-
   return (
     <div className={`donation-window ${doState ? "active" : "hidden"}`}>
       <button
@@ -175,13 +201,23 @@ export default function DonationWindow({ doState, setDoState }) {
           top: "0",
           left: "0",
           boxShadow: "none",
-          display: currentPage == 0 ? "none" : "",
         }}
-        onClick={() => {
-          setPage(0);
-        }}
+        onClick={
+          currentPage === 0
+            ? () => {
+                setDoState(false);
+                setPage(0);
+              }
+            : () => {
+                setPage(0);
+              }
+        }
       >
-        <i class="fi fi-rr-angle-left"></i>
+        {currentPage === 0 ? (
+          <i className="fi fi-rr-cross"></i>
+        ) : (
+          <i className="fi fi-rr-angle-left"></i>
+        )}
       </button>
       {pages[currentPage].content}
     </div>

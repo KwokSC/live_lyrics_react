@@ -20,6 +20,7 @@ import {
 import connectToSockJs from "../requests/socket.jsx";
 import base from "../requests/base.jsx";
 import DonationWindow from "../components/DonationWindow.jsx";
+import RoomUserPanel from "../components/RoomUserPanel.jsx";
 
 export default function RoomPage() {
   const navigate = useNavigate();
@@ -30,14 +31,14 @@ export default function RoomPage() {
   const [reState, setReState] = useState(false);
   const [hoState, setHoState] = useState(false);
   const [doState, setDoState] = useState(false);
+  const [panelState, setPanelState] = useState(false);
 
   const [roomTitle, setTitle] = useState("Room");
-  const [roomOwner, setOwner] = useState("Unknown");
   const [hostInfo, setHostInfo] = useState({
     userAccount: "Unknown",
     userName: "Unknown",
-    summary: "N/A"
-  })
+    summary: "N/A",
+  });
   const [isOline, setIsOnline] = useState(false);
   const [users, setUsers] = useState([]);
   const [songInfo, setSongInfo] = useState({
@@ -55,7 +56,7 @@ export default function RoomPage() {
   const [isPlaying, setIsPlaying] = useState(false);
 
   const navItemList = [
-    { text: "Explore", onClick: null },
+    { text: "Explore", onClick: ()=>{navigate("/explore")} },
     { text: "Following", onClick: null },
     { text: "Payment", onClick: null },
     { text: "Preferences", onClick: null },
@@ -101,9 +102,22 @@ export default function RoomPage() {
     base
       .get("/room/getRoomByRoomId", { params: { roomId: roomId } })
       .then((response) => {
-        if (response.data.data) {
-          setTitle(response.data.data.roomTitle);
-          setOwner(response.data.data.roomOwner);
+        const roomRes = response.data.data;
+        if (roomRes) {
+          setTitle(roomRes.roomTitle);
+          base
+            .get("/user/getProfileById", {
+              params: { id: roomRes.roomOwner },
+            })
+            .then((response) => {
+              const profileRes = response.data.data;
+              if (profileRes) {
+                setHostInfo(profileRes);
+              }
+            })
+            .catch((error) => {
+              console.error(error);
+            });
         } else {
           navigate("*");
         }
@@ -122,9 +136,9 @@ export default function RoomPage() {
         params: { roomId: roomId },
       })
       .then((response) => {
-        const programListRes = response.data.data.programList;
-        if (programListRes) {
-          setProgramList(programListRes);
+        const programmeRes = response.data.data;
+        if (programmeRes) {
+          setProgramList(programmeRes.programListRes);
         }
       })
       .catch((error) => {
@@ -305,7 +319,7 @@ export default function RoomPage() {
         onClick={() => {
           setNavState(false);
           setReState(false);
-          setDoState(false)
+          setDoState(false);
         }}
       />
       <HeadBar
@@ -314,17 +328,27 @@ export default function RoomPage() {
           setNavState(!navState);
         }}
         displayText={roomTitle}
-        handleBtnClick={()=>{
-          setHoState(!hoState)
+        handleBtnClick={() => {
+          setHoState(!hoState);
         }}
-        buttonIcon={<i class="fi fi-rr-circle-user"></i>}
+        buttonIcon={<i className="fi fi-rr-circle-user"></i>}
       />
       <NavBar navState={navState} navItemList={navItemList} />
-      <HostInfo hoState={hoState} setDoState={setDoState} hostName={hostInfo.userName} summary={hostInfo.summary}/>
-      <DonationWindow doState={doState} setDoState={setDoState}/>
+      <HostInfo
+        hoState={hoState}
+        setDoState={setDoState}
+        hostName={hostInfo.userName}
+        summary={hostInfo.summary}
+      />
+      <DonationWindow doState={doState} setDoState={setDoState} />
       <SongInfo songInfo={songInfo} albumCoverURL={albumCoverURL} />
       <SeekBar isSeekable={false} />
       <Lyric lyric={lyric} />
+      <RoomUserPanel
+        isExpanded={panelState}
+        setIsExpanded={setPanelState}
+        users={users}
+      />
       <Recommendation
         reState={reState}
         onReClick={() => {

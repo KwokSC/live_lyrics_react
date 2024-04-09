@@ -1,32 +1,29 @@
 import "./ExplorePage.scss";
 import RoomDisplay from "../components/RoomDisplay";
+import base from "../requests/base";
 import { useEffect, useState } from "react";
 
 export default function ExplorePage() {
   const [navState, setNavState] = useState(false);
   const [roomList, setRoomList] = useState([
-    {
-      roomTitle: "test",
-      roomOwner: "test_owner",
-    },
-    {
-      roomTitle: "test2",
-      roomOwner: "test_owner2",
-    },
-    {
-      roomTitle: "test3",
-      roomOwner: "test_owner3",
-    },
-    {
-      roomTitle: "test4",
-      roomOwner: "test_owner3",
-    },
   ]);
 
   function onNavClick() {
     setNavState(!navState);
   }
-  function getPopularRoom() {}
+  function getPopularRoom() {
+    base
+      .get("/room/getAllOnlineRooms")
+      .then((response) => {
+        const roomListRes = response.data.data
+        if(roomListRes){
+          setRoomList(roomListRes)
+        }
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  }
 
   useEffect(() => {
     getPopularRoom();

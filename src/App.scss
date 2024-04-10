@@ -181,7 +181,7 @@ body {
 }
 
 .nav-bar.hidden {
-  transform: translateX(-50vh);
+  transform: translateX(-100vw);
 }
 
 .lang-bar {
@@ -267,14 +267,15 @@ body {
     align-items: center;
     background-color: $secondary-color;
     border-radius: 15px;
-    height: min(400px, 35vh);
-    width: min(300px, 50vw);
+    height: min(400px, 50vh);
+    width: max(300px, 70vw);
     box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.1);
     transition: 0.5s;
 
     button{
       border: none;
       aspect-ratio: 1;
+      cursor: pointer;
     }
 
     .panel-header {
@@ -298,7 +299,7 @@ body {
         width: 40px;
         position: absolute;
         right: 0;
-        color: $primary-color;
+        color: #ffd7de;
         font-size: 15px;
         background: transparent;
         transition: 0.5s;
@@ -350,7 +351,7 @@ body {
     }
 
     .chat-box {
-      width: 85%;
+      width: 90%;
       flex-shrink: 0;
       display: flex;
       flex-direction: row;
@@ -383,4 +384,8 @@ body {
     transform-origin: left bottom;
     transform: scale(0);
   }
+}
+
+.bullet-screen{
+  
 }

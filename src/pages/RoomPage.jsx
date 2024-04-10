@@ -17,10 +17,11 @@ import {
   setGuestInfo,
   storeUserInfo,
 } from "../utils/cookie.jsx";
-import connectToSockJs from "../requests/socket.jsx";
+import client from "../requests/socket.jsx";
 import base from "../requests/base.jsx";
 import DonationWindow from "../components/DonationWindow.jsx";
 import RoomUserPanel from "../components/RoomUserPanel.jsx";
+import DanmuScreen from "../components/DanmuScreen.jsx";
 
 export default function RoomPage() {
   const navigate = useNavigate();
@@ -32,6 +33,7 @@ export default function RoomPage() {
   const [hoState, setHoState] = useState(false);
   const [doState, setDoState] = useState(false);
   const [panelState, setPanelState] = useState(false);
+  const [isLyricExpanded, setIsLyricExpanded] = useState(false);
 
   const [roomTitle, setTitle] = useState("Room");
   const [hostInfo, setHostInfo] = useState({
@@ -54,9 +56,15 @@ export default function RoomPage() {
   const [currentSong, setCurrentSong] = useState(null);
   const [currentTime, setCurrentTime] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [msgList, setMsgList] = useState([]);
 
   const navItemList = [
-    { text: "Explore", onClick: ()=>{navigate("/explore")} },
+    {
+      text: "Explore",
+      onClick: () => {
+        navigate("/explore");
+      },
+    },
     { text: "Following", onClick: null },
     { text: "Payment", onClick: null },
     { text: "Preferences", onClick: null },
@@ -74,6 +82,7 @@ export default function RoomPage() {
       setUsers(response.data.users);
     } else if (response.type === "USER EXIT") {
     } else if (response.type === "CHAT") {
+      handleChatMessage(response.data);
     }
   }
 
@@ -98,6 +107,10 @@ export default function RoomPage() {
     // setIsPlaying(isPlayingRes);
   }
 
+  function handleChatMessage(message) {
+    setMsgList((prevMsgList) => [...prevMsgList, message]);
+  }
+
   function getRoomByRoomId(roomId) {
     base
       .get("/room/getRoomByRoomId", { params: { roomId: roomId } })
@@ -106,8 +119,8 @@ export default function RoomPage() {
         if (roomRes) {
           setTitle(roomRes.roomTitle);
           base
-            .get("/user/getProfileById", {
-              params: { id: roomRes.roomOwner },
+            .get("/user/getProfileByAccount", {
+              params: { account: roomRes.roomOwner },
             })
             .then((response) => {
               const profileRes = response.data.data;
@@ -219,23 +232,14 @@ export default function RoomPage() {
       });
   }
 
-  function withStompClient(action) {
-    if (!stompClient) {
-      GlobalErrorContext.current.addErrorMsg("Not connected to the server.");
-      return;
-    }
-    action();
-  }
 
   function connectToRoom() {
-    const client = connectToSockJs();
     client.onConnect = (frame) => {
       console.log(frame);
-      setStompClient(client);
       client.subscribe(
         `/topic/${roomId}/public`,
         (message) => onMessageReceived(message),
-        { UserId: getUserInfo().userAccount }
+        { UserId: getUserInfo().userId }
       );
       client.publish({
         destination: `/app/${roomId}/user.enter`,
@@ -245,6 +249,18 @@ export default function RoomPage() {
       });
     };
     client.activate();
+  }
+
+  function sendMessage(chatMsg) {
+    if(client.connected){
+      client.publish({
+        destination: `/app/${roomId}/chat`,
+        body: JSON.stringify({
+          sender: getUserInfo().userAccount,
+          content: chatMsg,
+        }),
+      });
+    }
   }
 
   // Everytime a new use enter a room, the app tries to subscribe the room
@@ -259,16 +275,16 @@ export default function RoomPage() {
     getProgrammeById(roomId);
 
     return () => {
-      if (stompClient) {
-        stompClient.publish({
+      if(client.connected){
+        client.publish({
           destination: `/app/${roomId}/user.exit`,
           headers: {
             UserId: getUserInfo().userAccount,
           },
         });
-        stompClient.disactivate();
-        setStompClient(null);
+        client.deactivate();
       }
+      
     };
     // eslint-disable-next-line
   }, []);
@@ -322,6 +338,7 @@ export default function RoomPage() {
           setDoState(false);
         }}
       />
+      <DanmuScreen messages={msgList} />
       <HeadBar
         navState={navState}
         handleNavClick={() => {
@@ -338,16 +355,26 @@ export default function RoomPage() {
         hoState={hoState}
         setDoState={setDoState}
         hostName={hostInfo.userName}
+        profileImg={hostInfo.profileImg}
         summary={hostInfo.summary}
       />
       <DonationWindow doState={doState} setDoState={setDoState} />
-      <SongInfo songInfo={songInfo} albumCoverURL={albumCoverURL} />
+      <SongInfo
+        songInfo={songInfo}
+        albumCoverURL={albumCoverURL}
+        isLyricExpanded={isLyricExpanded}
+      />
       <SeekBar isSeekable={false} />
-      <Lyric lyric={lyric} />
+      <Lyric
+        lyric={lyric}
+        isExpanded={isLyricExpanded}
+        setIsExpanded={setIsLyricExpanded}
+      />
       <RoomUserPanel
         isExpanded={panelState}
         setIsExpanded={setPanelState}
         users={users}
+        sendMessage={sendMessage}
       />
       <Recommendation
         reState={reState}

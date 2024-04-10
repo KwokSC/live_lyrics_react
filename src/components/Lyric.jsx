@@ -2,7 +2,7 @@ import { useEffect, useState, useRef } from "react";
 import LangBar from "./LangBar";
 import { usePlayerContext } from "./PlayerContext";
 
-export default function Lyric({ lyric }) {
+export default function Lyric({ lyric, isExpanded, setIsExpanded }) {
   let timeArr = [];
   let lrcArr = [];
 
@@ -10,7 +10,8 @@ export default function Lyric({ lyric }) {
   const [lyricTime, setTimeList] = useState([]);
   const [language, setLanguage] = useState("");
   const { currentTime } = usePlayerContext();
-  const lyricWrapperRef = useRef(null);
+  const lyricContentRef = useRef();
+  const lyricWrapperRef = useRef();
 
   useEffect(() => {
     const userLanguage = navigator.language || navigator.userLanguage;
@@ -83,15 +84,15 @@ export default function Lyric({ lyric }) {
 
   function scrollToCurrentLyric() {
     // Scroll to the current lyric and make it center.
-    if (lyricWrapperRef.current) {
+    if (lyricContentRef.current) {
       const currentLyricIndex = getCurrentLyricIndex();
       if (currentLyricIndex !== -1) {
-        const lyricItem = lyricWrapperRef.current.children[currentLyricIndex];
-        const lyricWrapperHeight = lyricWrapperRef.current.offsetHeight;
+        const lyricItem = lyricContentRef.current.children[currentLyricIndex];
+        const lyricWrapperHeight = lyricContentRef.current.offsetHeight;
         const lyricItemHeight = lyricItem.offsetHeight;
         const scrollPosition =
           lyricItem.offsetTop - lyricWrapperHeight / 2 + lyricItemHeight / 2;
-        lyricWrapperRef.current.scrollTo({
+        lyricContentRef.current.scrollTo({
           top: Math.max(0, scrollPosition),
           behavior: "smooth",
         });
@@ -100,8 +101,20 @@ export default function Lyric({ lyric }) {
   }
 
   return (
-    <div className="lyric-wrapper">
-      <ul className="lyric-content" ref={lyricWrapperRef}>
+    <div className="lyric-wrapper" ref={lyricWrapperRef}>
+      <button
+        className={isExpanded ? "activated" : ""}
+        style={{
+          fontSize: "15px",
+          position: "absolute",
+          bottom: "13vh",
+          right: "10vw",
+        }}
+        onClick={() => setIsExpanded(!isExpanded)}
+      >
+        <i className="fi fi-rr-expand"></i>
+      </button>
+      <ul className="lyric-content" ref={lyricContentRef}>
         {lyricContent.map((line, index) => (
           <li
             className={index === getCurrentLyricIndex() ? "highlight" : ""}

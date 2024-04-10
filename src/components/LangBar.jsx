@@ -1,21 +1,17 @@
-import { useState } from 'react';
+import { useState } from "react";
 
-export default function LangBar({language, setLanguage}) {
+export default function LangBar({ language, setLanguage }) {
   const [isListVisible, setListVisible] = useState(false);
-  const languageOptions = ['EN', 'CN', 'JP', 'FR'];
+  const languageOptions = ["EN", "CN", "JP", "FR"];
 
-  function toggleList() {
-    setListVisible(!isListVisible);
-  };
-
-  function handleLanguageSelect(language){
+  function handleLanguageSelect(language) {
     setLanguage(language);
     setListVisible(false);
-  };
+  }
 
   return (
     <div className="lang-bar">
-      <button onClick={toggleList}>{language}</button>
+      <button onClick={() => setListVisible(!isListVisible)}>{language}</button>
 
       {isListVisible && (
         <ul className="lang-selector">
@@ -28,4 +24,4 @@ export default function LangBar({language, setLanguage}) {
       )}
     </div>
   );
-};
+}

@@ -64,6 +64,7 @@ export function setGuestInfo() {
   Cookies.set(
     "userInfo",
     JSON.stringify({
+      userId: userId,
       userAccount: userId,
       userName: "guest_" + userId,
     })

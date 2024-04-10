@@ -1,7 +1,13 @@
 import RoomUserInfo from "./RoomUserInfo";
 import { useState } from "react";
 
-export default function RoomUserPanel({ isExpanded, setIsExpanded, users }) {
+export default function RoomUserPanel({
+  isExpanded,
+  setIsExpanded,
+  users,
+  sendMessage,
+}) {
+
   const [chatMsg, setMsg] = useState("");
 
   return (
@@ -20,11 +26,17 @@ export default function RoomUserPanel({ isExpanded, setIsExpanded, users }) {
         </div>
         <div className="chat-box">
           <input
+            value={chatMsg}
             onChange={(e) => {
               setMsg(e.target.value);
             }}
           />
-          <button>
+          <button
+            onClick={() => {
+              setMsg("");
+              sendMessage(chatMsg);
+            }}
+          >
             <i className="fi fi-rr-paper-plane"></i>
           </button>
         </div>

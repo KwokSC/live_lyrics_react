@@ -15,7 +15,7 @@
   top: 10vh;
   background-color: $secondary-color;
   width: max(300px, 60vw);
-  z-index: 2;
+  z-index: 3;
   height: 40vh;
   display: flex;
   flex-direction: column;
@@ -140,7 +140,7 @@
   background: linear-gradient(200deg, #ffa2b2, #7eabef);
   width: min(300px, 60vw);
   height: 45vh;
-  z-index: 1;
+  z-index: 3;
   border-bottom-left-radius: 15px;
   box-shadow: 5px 5px 5px rgba(0, 0, 0, 0.2);
   transition: 0.5s;
@@ -232,8 +232,7 @@
   .album-wrapper {
     position: relative;
     aspect-ratio: 1;
-    margin-top: 2vh;
-    margin-bottom: 2vh;
+    margin-block: 2vh;
     width: 30vh;
     border: none;
     border-radius: 2vh;
@@ -258,58 +257,13 @@
   }
 }
 
-.lyric-wrapper {
-  display: flex;
-  flex-direction: column;
-  width: 70vw;
-  height: 40vh;
-  background-color: transparent;
-  overflow: hidden;
-  border-radius: 20px;
-  justify-content: center;
-  align-items: center;
-  margin-block: 2vh;
-  .lyric-content {
-    position: relative;
-    width: 100%;
-    height: 100%;
-    transition: 0.5s;
-    list-style: none;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: safe center;
-    overflow: scroll;
-    li {
-      text-shadow: 1px 1px 10px rgba(128, 128, 128, 0.5);
-      text-align: center;
-      font-size: 2vh;
-      margin-block: 5px;
-      color: $secondary-color;
-      transition: 0.5s;
-    }
-    li.highlight {
-      width: 100%;
-      font-size: 2.5vh;
-      color: $primary-color;
-      background-image: linear-gradient(
-        to left,
-        transparent,
-        $secondary-color,
-        $secondary-color,
-        transparent
-      );
-    }
-  }
-}
-
 .recommendation {
   position: absolute;
   left: 0;
   bottom: 0;
-  padding-block: 10px;
+  padding-block: 5px;
   width: 100%;
-  height: 60vh;
+  height: 500px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -318,7 +272,7 @@
   transition: 0.5s;
   background-color: $secondary-color;
   box-shadow: 5px 5px 5px rgba(0, 0, 0, 0.1);
-  z-index: 2;
+  z-index: 3;
   button {
     display: flex;
     width: 30%;
@@ -327,8 +281,9 @@
     border: none;
     background-color: transparent;
     color: $primary-color;
-    font-size: 20px;
+    font-size: 15px;
     font-weight: bold;
+    cursor: pointer;
   }
   .content {
     width: 90%;
@@ -356,50 +311,5 @@
 }
 
 .recommendation.hidden {
-  transform: translateY(58.5vh);
-}
-
-.player-wrapper {
-  width: 70vw;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-}
-
-.player-seekbar {
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  align-items: center;
-  height: 2vh;
-  width: 70vw;
-  margin-block: 10px;
-  input[type="range"] {
-    width: 80%;
-    height: 10px;
-    appearance: none;
-    background: $secondary-color;
-    border-radius: 5px;
-    margin-inline: 10px;
-    outline: none;
-    cursor: pointer;
-    overflow: hidden;
-    box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.1);
-  }
-  input[type="range"]::-webkit-slider-thumb {
-    appearance: none;
-    background: $primary-color;
-    height: 10px;
-    width: 10px;
-    border-radius: 50%;
-    box-shadow: -100vw 0 0 99vw $primary-color;
-  }
-  span {
-    width: 10%;
-    color: $primary-color;
-    font-family: Impact, Haettenschweiler, "Arial Narrow Bold", sans-serif;
-    letter-spacing: 1px;
-    text-shadow: 2px 2px 2px rgba(0, 0, 0, 0.1);
-  }
+  transform: translateY(490px);
 }

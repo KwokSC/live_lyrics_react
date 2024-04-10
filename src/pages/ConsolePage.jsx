@@ -16,24 +16,29 @@ import {
   storeRoomId,
   getUserInfo,
 } from "../utils/cookie.jsx";
-import connectToSockJs from "../requests/socket.jsx";
+import client from "../requests/socket.jsx";
 import base from "../requests/base.jsx";
 import api from "../requests/api.jsx";
+import RoomUserPanel from "../components/RoomUserPanel.jsx";
+import DanmuScreen from "../components/DanmuScreen.jsx";
 
 export default function ConsolePage() {
   const navigate = useNavigate();
   const GlobalErrorContext = useRef(useGlobalError());
   const [roomId, setRoomId] = useState(null);
   const [roomTitle, setTitle] = useState("Room");
-  const [roomOwner, setOwner] = useState("Unknown");
   const [isOnline, setIsOnline] = useState(false);
   const [users, setUsers] = useState([]);
+
   const [navState, setNavState] = useState(false);
+  const [panelState, setPanelState] = useState(false);
+  const [isLyricExpanded, setIsLyricExpanded] = useState(false);
+
   const [programList, setProgramList] = useState([]);
-  const [stompClient, setStompClient] = useState(null);
   const [currentSong, setCurrentSong] = useState(null);
   const [audio, setAudio] = useState(null);
   const [lyric, setLyric] = useState([]);
+  const [msgList, setMsgList] = useState([]);
 
   const navItemList = [
     { text: "Profile", onClick: null },
@@ -86,7 +91,12 @@ export default function ConsolePage() {
       setUsers(response.data.users);
     } else if (response.type === "USER EXIT") {
     } else if (response.type === "CHAT") {
+      handleChatMessage(response.data);
     }
+  }
+
+  function handleChatMessage(message) {
+    setMsgList((prevMsgList) => [...prevMsgList, message]);
   }
 
   function startLive() {
@@ -103,17 +113,9 @@ export default function ConsolePage() {
       });
   }
 
-  function withStompClient(action) {
-    if (!stompClient || !stompClient.connected) {
-      GlobalErrorContext.current.addErrorMsg("Not connected to the room.");
-      return;
-    }
-    action();
-  }
-
   function getRoomByUserId() {
     api
-      .get("/room/getRoomByUserId")
+      .get("/room/getRoomByUserAccount")
       .then((response) => {
         if (response.data.data) {
           setRoomId(response.data.data.roomId);
@@ -138,17 +140,15 @@ export default function ConsolePage() {
   }
 
   function updatePlayStatus(currentSong, currentTime, isPlaying) {
-    withStompClient(() => {
-      stompClient.send(
-        `/app/${roomId}/status.update`,
-        { Type: "PLAYER" },
-        JSON.stringify({
+      client.publish({
+        destination: `/app/${roomId}/status.update`,
+        headers: { Type: "PLAYER" },
+        body: JSON.stringify({
           currentSong: currentSong,
           currentTime: currentTime,
           isPlaying: isPlaying,
-        })
-      );
-    });
+        }),
+      });
   }
 
   function handlePlayAt(songId) {
@@ -176,9 +176,9 @@ export default function ConsolePage() {
     base
       .get("/room/getRoomByRoomId", { params: { roomId: roomId } })
       .then((response) => {
-        if (response.data.data) {
-          setTitle(response.data.data.roomTitle);
-          setOwner(response.data.data.roomOwner);
+        const room = response.data.data;
+        if (room) {
+          setTitle(room.roomTitle);
         } else {
           navigate("*");
         }
@@ -225,10 +225,8 @@ export default function ConsolePage() {
   }
 
   function connectToRoom() {
-    const client = connectToSockJs();
     client.onConnect = (frame) => {
       console.log(frame);
-      setStompClient(client);
       client.subscribe(
         `/topic/${roomId}/public`,
         (message) => onMessageReceived(message),
@@ -246,6 +244,18 @@ export default function ConsolePage() {
     client.activate();
   }
 
+  function sendMessage(chatMsg) {
+    if(client.connected){
+      client.publish({
+        destination: `/app/${roomId}/chat`,
+        body: JSON.stringify({
+          sender: getUserInfo().userAccount,
+          content: chatMsg,
+        }),
+      });
+    }
+  }
+
   // The first time the console page is opened, it check if user is login
   // Then it will connect to the websocket server.
   useEffect(() => {
@@ -257,15 +267,15 @@ export default function ConsolePage() {
     }
 
     return () => {
-      if (stompClient) {
+      if (client.connected) {
         console.log("Sock Client disconnects.");
-        stompClient.publish({
+        client.publish({
           destination: `/app/${roomId}/user.exit`,
           headers: {
             UserId: getUserInfo().userAccount,
           },
         });
-        stompClient.deactivate();
+        client.deactivate();
       }
     };
     // eslint-disable-next-line
@@ -317,6 +327,7 @@ export default function ConsolePage() {
   return (
     <PlayerContextProvider>
       <div className="console-page">
+        <DanmuScreen messages={msgList} />
         <Overlay
           isCovered={navState}
           onClick={() => {
@@ -329,15 +340,30 @@ export default function ConsolePage() {
             setNavState(!navState);
           }}
           displayText={roomTitle}
-          handleBtnClick={()=>{
-            navigate("/program")
+          handleBtnClick={() => {
+            navigate("/program");
           }}
           buttonIcon={<i className="fi fi-sr-album"></i>}
         />
         <NavBar navState={navState} navItemList={navItemList} />
-        <div className="program-console-container">{ConsoleDisplay()}</div>
+        <div
+          style={{ display: isLyricExpanded ? "none" : "" }}
+          className="program-console-container"
+        >
+          {ConsoleDisplay()}
+        </div>
         <Player audio={audio} isSeekable={true} />
-        <Lyric lyric={lyric} />
+        <Lyric
+          lyric={lyric}
+          isExpanded={isLyricExpanded}
+          setIsExpanded={setIsLyricExpanded}
+        />
+        <RoomUserPanel
+          isExpanded={panelState}
+          setIsExpanded={setPanelState}
+          users={users}
+          sendMessage={sendMessage}
+        />
       </div>
     </PlayerContextProvider>
   );

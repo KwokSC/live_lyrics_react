@@ -1,6 +1,9 @@
-export default function SongInfo({ songInfo, albumCoverURL }) {
+export default function SongInfo({ songInfo, albumCoverURL, isLyricExpanded }) {
   return (
-    <div className="song-wrapper">
+    <div
+      className="song-wrapper"
+      style={{ display: isLyricExpanded ? "none" : "" }}
+    >
       <div className="album-wrapper">
         {albumCoverURL ? (
           <img alt="album-cover" src={albumCoverURL} />

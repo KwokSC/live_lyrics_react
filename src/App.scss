@@ -504,6 +504,7 @@ body {
   height: 40vh;
   overflow: hidden;
   z-index: 2;
+  pointer-events: none;
   .chat-message{
     display: flex;
     flex-direction: row;

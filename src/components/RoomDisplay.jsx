@@ -13,7 +13,7 @@ export default function RoomDisplay({ room }) {
       <div className="room-header">
         <p>{room.roomTitle}</p>
         <div className="online-count">
-          <i class="fi fi-rr-users-alt"></i>
+          <i className="fi fi-rr-users-alt"></i>
           <p>{room.audienceAmount}</p>
         </div>
       </div>

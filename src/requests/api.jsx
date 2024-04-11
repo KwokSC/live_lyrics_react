@@ -6,7 +6,7 @@ import {
   removeUserInfo,
 } from "../utils/cookie";
 
-const baseURL = "http://" + process.env.REACT_APP_ENDPOINT;
+const baseURL = "https://" + process.env.REACT_APP_ENDPOINT;
 
 const api = axios.create({
   baseURL: baseURL,

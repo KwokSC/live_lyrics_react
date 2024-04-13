@@ -164,7 +164,7 @@ export default function ConsolePage() {
       .then((response) => {
         const res = response.data.data;
         if (res) {
-          setProgramList(res.programListRes);
+          setProgramList(res.programList);
         }
       })
       .catch((error) => {

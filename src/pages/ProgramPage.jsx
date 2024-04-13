@@ -1,6 +1,7 @@
 import "./ProgramPage.scss";
 import { Fragment, useEffect, useState } from "react";
 import PopModal from "../components/PopModal.jsx";
+import Overlay from "../components/Overlay";
 import { useNavigate } from "react-router-dom";
 import base from "../requests/base.jsx";
 import { useGlobalError } from "../components/GlobalErrorContext.jsx";
@@ -20,6 +21,17 @@ export default function ProgramPage() {
   const [modalIsOpen, setModalIsOpen] = useState(false);
   const [programIdToDelete, setProgramIdToDelete] = useState("");
 
+  const deleteConfirm = (
+    <>
+      <div className="pop-modal" style={{ display: modalIsOpen ? "" : "none" }}>
+        <p>{"Are you sure to delete program" + { programIdToDelete } + "?"}</p>
+        <button onClick={confirmDelete}>Yes</button>
+        <button onClick={() => setModalIsOpen(false)}>Cancel</button>
+      </div>
+      <Overlay isCovered={modalIsOpen} onClick={() => setModalIsOpen(false)} />
+    </>
+  );
+
   function handleDelete(programIdToDelete) {
     setProgramIdToDelete(programIdToDelete);
     setModalIsOpen(true);
@@ -31,10 +43,6 @@ export default function ProgramPage() {
       (program) => program.programId !== programIdToDelete
     );
     setProgramList(newProgramList);
-    setModalIsOpen(false);
-  }
-
-  function closeModal() {
     setModalIsOpen(false);
   }
 
@@ -110,15 +118,7 @@ export default function ProgramPage() {
           </Fragment>
         )}
       </div>
-      <PopModal
-        modalIsOpen={modalIsOpen}
-        programIdToDelete={programIdToDelete}
-        confirmAction={confirmDelete}
-        closeModal={closeModal}
-        displayText={
-          "Are you sure to delete program" + { programIdToDelete } + "?"
-        }
-      />
+      <PopModal content={deleteConfirm} />
     </div>
   );
 }

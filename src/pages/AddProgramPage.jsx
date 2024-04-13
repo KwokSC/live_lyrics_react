@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useGlobalError } from "../components/GlobalErrorContext.jsx";
 import { v4 as uuidv4 } from "uuid";
@@ -12,12 +12,14 @@ import {
   storeRoomId,
   getRoomId,
 } from "../utils/cookie.jsx";
-import Overlay from "../components/Overlay.jsx"
+import PopModal from "../components/PopModal.jsx"
+import Overlay from "../components/Overlay.jsx";
 
 export default function AddProgramPage() {
   const navigate = useNavigate();
   const { addErrorMsg } = useGlobalError();
 
+  const [isModalOpen, setIsOpen] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [newProgramId, setNewId] = useState(undefined);
   const [songName, setSongName] = useState("");
@@ -28,6 +30,26 @@ export default function AddProgramPage() {
   const [audio, setAudio] = useState(null);
   const [lyricList, setLyricList] = useState([]);
   const [recommendationList, setRecommendationList] = useState([]);
+  const statusTextRef = useRef();
+  const statusImgRef = useRef();
+
+  const uploadingWindow = (
+    <>
+      <div className="pop-modal" style={{ display: isModalOpen ? "" : "none" }}>
+        <p ref={statusTextRef}></p>
+        <i ref={statusImgRef}></i>
+      </div>
+      <Overlay
+        isCovered={isModalOpen}
+        onClick={() => {
+          if (isUploading) {
+            return;
+          }
+          setIsOpen(false);
+        }}
+      />
+    </>
+  );
 
   function transformFile(file, filePrefix) {
     if (!file) {
@@ -116,7 +138,12 @@ export default function AddProgramPage() {
       return;
     }
 
-    setIsUploading(true)
+    setIsOpen(true)
+    setIsUploading(true);
+    statusTextRef.current.innerText =
+      "New program is uploading, please do not close the window...";
+    statusImgRef.current.className = "fi fi-rr-cloud-upload";
+
     const song = {
       songId: "song_" + newProgramId,
       songName: songName,
@@ -149,21 +176,24 @@ export default function AddProgramPage() {
     api
       .post("/song/submit", formData)
       .then((response) => {
-        if(response.data.code === 200){
-
+        if (response.data.code === 200) {
+          statusTextRef.current.innerText =
+            "Congrats! You new program was uploaded successfully.";
+          statusImgRef.current.className = "fi fi-rr-cloud-check";
           setTimeout(() => {
             navigate("/program");
           }, 3000);
         }
       })
       .catch((error) => {
-        console.error(error)
+        statusTextRef.current.innerText =
+          "Sorry we failed to upload the program, please try again.";
+        statusImgRef.current.className = "fi fi-rr-cloud-exclamation";
+        console.error(error);
       });
   }
 
-  async function submitAsync(){
-    
-  }
+  async function submitAsync() {}
 
   function handleLangSelectChange(event, index) {
     const updatedList = [...lyricList];
@@ -270,11 +300,13 @@ export default function AddProgramPage() {
 
   return (
     <div className="add-program-page">
-      <Overlay isCovered={isUploading}/>
+      <PopModal content={uploadingWindow} />
       <div className="program-bar">
         <button onClick={() => navigate("/program")}>&#x00AB;</button>
         <p>New Program</p>
-        <button onClick={() => handleSubmit()}>&#x2713;</button>
+        <button disabled={isUploading} onClick={() => handleSubmit()}>
+          &#x2713;
+        </button>
       </div>
       <div className="program-container">
         <p>Album Cover</p>

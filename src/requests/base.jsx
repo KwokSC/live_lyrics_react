@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const baseURL = "https://" + process.env.REACT_APP_ENDPOINT;
+const baseURL = process.env.REACT_APP_HTTP_ENDPOINT;
 
 const base = axios.create({
   baseURL: baseURL,

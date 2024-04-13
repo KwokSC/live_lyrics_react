@@ -1,6 +1,6 @@
 import { Client } from "@stomp/stompjs";
 
-const brokerURL = "wss://" + process.env.REACT_APP_ENDPOINT + "/ws";
+const brokerURL = process.env.REACT_APP_WS_ENDPOINT;
 
 const client = new Client({
   brokerURL: brokerURL,

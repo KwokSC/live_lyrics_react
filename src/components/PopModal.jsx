@@ -1,5 +1,6 @@
 import { Fragment } from "react";
 import { createPortal } from "react-dom";
+import Overlay from "./Overlay";
 
 export default function PopModal({
   modalIsOpen,
@@ -17,11 +18,7 @@ export default function PopModal({
         <button onClick={confirmAction}>Yes</button>
         <button onClick={closeModal}>Cancel</button>
       </div>
-      <div
-        className="overlay"
-        style={{ display: modalIsOpen ? "" : "none" }}
-        onClick={closeModal}
-      ></div>
+      <Overlay isCovered={modalIsOpen} onClick={closeModal} />
     </Fragment>,
     document.getElementById("root")
   );

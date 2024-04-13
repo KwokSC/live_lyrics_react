@@ -16,10 +16,7 @@ import {
 export default function ProgramPage() {
   const navigate = useNavigate();
   const { addErrorMsg } = useGlobalError();
-  const [programList, setProgramList] = useState([
-    { song: { songName: "", songArtist: "", songDuration: 0 } },
-    { song: { songName: "", songArtist: "", songDuration: 0 } },
-  ]);
+  const [programList, setProgramList] = useState([]);
   const [modalIsOpen, setModalIsOpen] = useState(false);
   const [programIdToDelete, setProgramIdToDelete] = useState("");
 

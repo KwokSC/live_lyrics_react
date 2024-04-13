@@ -12,32 +12,22 @@ import {
   storeRoomId,
   getRoomId,
 } from "../utils/cookie.jsx";
+import Overlay from "../components/Overlay.jsx"
 
 export default function AddProgramPage() {
   const navigate = useNavigate();
   const { addErrorMsg } = useGlobalError();
+
+  const [isUploading, setIsUploading] = useState(false);
   const [newProgramId, setNewId] = useState(undefined);
   const [songName, setSongName] = useState("");
   const [songArtist, setSongArtist] = useState("");
   const [songAlbum, setSongAlbum] = useState("");
+  const [songDuration, setDuration] = useState(0);
   const [albumCover, setAlbumCover] = useState(null);
   const [audio, setAudio] = useState(null);
-  const [lyricList, setLyricList] = useState([
-    {
-      lang: "",
-      file: "",
-    },
-  ]);
-  const [recommendationList, setRecommendationList] = useState([
-    {
-      type: "",
-      content: "",
-    },
-  ]);
-
-  function handleBack() {
-    navigate("/program");
-  }
+  const [lyricList, setLyricList] = useState([]);
+  const [recommendationList, setRecommendationList] = useState([]);
 
   function transformFile(file, filePrefix) {
     if (!file) {
@@ -61,17 +51,15 @@ export default function AddProgramPage() {
     return formData;
   }
 
-  function uploadSongInfo() {
+  function uploadSong() {
     const song = {
       songId: "song_" + newProgramId,
       songName: songName,
       songAlbum: songAlbum,
       songArtist: songArtist,
+      songDuration: songDuration,
     };
-    api
-      .post("/song/uploadSong", song)
-      .then((response) => {})
-      .catch((error) => {});
+    return api.post("/song/uploadSong", song);
   }
 
   function uploadProgram() {
@@ -79,14 +67,11 @@ export default function AddProgramPage() {
       songId: "song_" + newProgramId,
       recommendations: recommendationList,
     };
-    api
-      .post("/program/uploadProgram", program, {
-        params: {
-          roomId: getRoomId(),
-        },
-      })
-      .then((response) => {})
-      .catch((error) => {});
+    return api.post("/program/uploadProgram", program, {
+      params: {
+        roomId: getRoomId(),
+      },
+    });
   }
 
   function uploadFiles(endpointsAndDataArray) {
@@ -131,25 +116,53 @@ export default function AddProgramPage() {
       return;
     }
 
-    const audioFormData = transformFile(audio, "audio");
-    const albumCoverFormData = transformFile(albumCover, "album");
-    const lyricFormData = transformLyrics(lyricList);
+    setIsUploading(true)
+    const song = {
+      songId: "song_" + newProgramId,
+      songName: songName,
+      songAlbum: songAlbum,
+      songArtist: songArtist,
+      songDuration: songDuration,
+    };
+    const program = {
+      songId: "song_" + newProgramId,
+      recommendations: recommendationList,
+    };
 
-    const filesData = [
-      { endPoint: "/song/uploadAudio", formData: audioFormData },
-      { endPoint: "/song/uploadAlbumCover", formData: albumCoverFormData },
-      { endPoint: "/song/uploadLyric", formData: lyricFormData },
-    ];
+    const formData = new FormData();
+    formData.append("roomId", getRoomId());
+    formData.append("song", JSON.stringify(song));
+    formData.append("program", JSON.stringify(program));
+    const audioBlob = new Blob([audio], { type: audio.type });
+    const imgBlob = new Blob([albumCover], { type: albumCover.type });
+    formData.append("audio", audioBlob, "audio_" + newProgramId);
+    formData.append("album", imgBlob, "album_" + newProgramId);
 
-    uploadFiles(filesData)
-      .then((results) => {
-        // All files uploaded successfully
-        console.log("Upload results:", results);
+    lyricList.forEach((item) => {
+      if (!item.file) {
+        return;
+      }
+      const blob = new Blob([item.file], { type: item.file.type });
+      formData.append("lyric", blob, "lyric_" + item.lang + "_" + newProgramId);
+    });
+
+    api
+      .post("/song/submit", formData)
+      .then((response) => {
+        if(response.data.code === 200){
+
+          setTimeout(() => {
+            navigate("/program");
+          }, 3000);
+        }
       })
       .catch((error) => {
-        // Error occurred during file upload
-        console.error("Upload error:", error);
+        console.error(error)
       });
+  }
+
+  async function submitAsync(){
+    
   }
 
   function handleLangSelectChange(event, index) {
@@ -207,6 +220,12 @@ export default function AddProgramPage() {
   function handleAudioSelect(event) {
     const file = event.target.files[0];
     if (!file) return;
+    const audio = new Audio();
+    audio.src = URL.createObjectURL(file);
+    audio.addEventListener("loadedmetadata", () => {
+      const durationInSeconds = parseInt(audio.duration);
+      setDuration(durationInSeconds);
+    });
     const reader = new FileReader();
     reader.onload = function (event) {
       setAudio(event.target.result);
@@ -224,10 +243,6 @@ export default function AddProgramPage() {
       setLyricList(updatedList);
     };
     reader.readAsDataURL(file);
-  }
-
-  function deleteFile() {
-    setAlbumCover(null);
   }
 
   useEffect(() => {
@@ -255,8 +270,9 @@ export default function AddProgramPage() {
 
   return (
     <div className="add-program-page">
+      <Overlay isCovered={isUploading}/>
       <div className="program-bar">
-        <button onClick={() => handleBack()}>&#x00AB;</button>
+        <button onClick={() => navigate("/program")}>&#x00AB;</button>
         <p>New Program</p>
         <button onClick={() => handleSubmit()}>&#x2713;</button>
       </div>
@@ -266,7 +282,7 @@ export default function AddProgramPage() {
           {albumCover ? (
             <div className="img-preview">
               <img src={albumCover} />
-              <button onClick={() => deleteFile()}>&#x2716;</button>
+              <button onClick={() => setAlbumCover(null)}>&#x2716;</button>
             </div>
           ) : (
             <button

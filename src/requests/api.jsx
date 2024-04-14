@@ -11,7 +11,6 @@ const baseURL = process.env.REACT_APP_HTTP_ENDPOINT;
 const api = axios.create({
   baseURL: baseURL,
   headers:{
-    "Content-Type": "application/json",
     'Access-Control-Allow-Origin' : '*',
   }
 });

@@ -186,6 +186,7 @@ export default function AddProgramPage() {
         }
       })
       .catch((error) => {
+        setIsUploading(false)
         statusTextRef.current.innerText =
           "Sorry we failed to upload the program, please try again.";
         statusImgRef.current.className = "fi fi-rr-cloud-exclamation";

@@ -4,13 +4,17 @@ import { usePlayerContext } from "./PlayerContext";
 export default function SeekBar({ isSeekable, handleSeekBarChange }) {
   const [durationDisplay, setDurationDisplay] = useState("");
   const [currentDisplay, setCurrentDisplay] = useState("");
-  const { currentTime, songDuration } = usePlayerContext();
+  const { currentTime, currentSong } = usePlayerContext();
 
   useEffect(() => {
-    const songSecond = parseInt(songDuration % 60);
-    const songMinute = parseInt((songDuration / 60) % 60);
-    setDurationDisplay(songMinute + ":" + songSecond);
-  }, [songDuration]);
+    if(currentSong.songDuration){
+      const songSecond = parseInt(currentSong.songDuration % 60);
+      const songMinute = parseInt((currentSong.songDuration / 60) % 60);
+      setDurationDisplay(songMinute + ":" + songSecond);
+    }else{
+      setDurationDisplay("0:0");
+    }
+  }, [currentSong]);
 
   useEffect(() => {
     const currentSecond = parseInt(currentTime % 60);
@@ -20,18 +24,18 @@ export default function SeekBar({ isSeekable, handleSeekBarChange }) {
 
   return (
     <div className="player-seekbar">
-      <span id="current-time">{currentDisplay}</span>
+      <span>{currentDisplay}</span>
       <input
         type="range"
         className="seek-bar"
         step={1}
         value={currentTime}
         min={0}
-        max={songDuration}
+        max={currentSong.songDuration}
         readOnly={!isSeekable}
         onChange={isSeekable ? handleSeekBarChange : null}
       />
-      <span id="duration">{durationDisplay}</span>
+      <span>{durationDisplay}</span>
     </div>
   );
 }

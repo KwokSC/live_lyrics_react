@@ -169,7 +169,7 @@ export default function AddProgramPage() {
       if (!item.file) {
         return;
       }
-      const blob = new Blob([item.file], { type: item.file.type });
+      const blob = new Blob([item.file], { type: "text/plain" });
       formData.append("lyric", blob, "lyric_" + item.lang + "_" + newProgramId);
     });
 

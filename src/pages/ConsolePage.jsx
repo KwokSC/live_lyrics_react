@@ -24,7 +24,7 @@ import DanmuScreen from "../components/DanmuScreen.jsx";
 
 export default function ConsolePage() {
   const navigate = useNavigate();
-  const GlobalErrorContext = useRef(useGlobalError());
+  const { addErrorMsg } = useGlobalError();
   const [roomId, setRoomId] = useState(null);
   const [roomTitle, setTitle] = useState("Room");
   const [isOnline, setIsOnline] = useState(false);
@@ -35,9 +35,6 @@ export default function ConsolePage() {
   const [isLyricExpanded, setIsLyricExpanded] = useState(false);
 
   const [programList, setProgramList] = useState([]);
-  const [currentSong, setCurrentSong] = useState(null);
-  const [audio, setAudio] = useState(null);
-  const [lyric, setLyric] = useState([]);
   const [msgList, setMsgList] = useState([]);
 
   const navItemList = [
@@ -45,51 +42,13 @@ export default function ConsolePage() {
     { text: "Preferences", onClick: null },
   ];
 
-  const ConsoleDisplay = () => {
-    if (!isOnline) {
-      return (
-        <div className="offline-container">
-          <p id="info">Room Offline</p>
-          <button onClick={startLive}>Start Live</button>
-        </div>
-      );
-    }
-
-    return (
-      <>
-        {programList.length === 0 ? (
-          <p id="info">No program, please add.</p>
-        ) : (
-          programList.map((program, index) => (
-            <ProgramConsoleUnit
-              key={index}
-              program={program}
-              index={index}
-              currentSong={currentSong}
-              handlePlayAt={handlePlayAt}
-            />
-          ))
-        )}
-      </>
-    );
-  };
-
-  function findSongDuration() {
-    const program = programList.find(
-      (program) => program.song.songId === currentSong
-    );
-    if (program) {
-      return program.song.songDuration;
-    }
-    return 0;
-  }
-
   function onMessageReceived(message) {
     const response = JSON.parse(message.body);
     console.log(response);
     if (response.type === "USER ENTER") {
       setUsers(response.data.users);
     } else if (response.type === "USER EXIT") {
+      setUsers(response.data.users);
     } else if (response.type === "CHAT") {
       handleChatMessage(response.data);
     }
@@ -109,7 +68,7 @@ export default function ConsolePage() {
       })
       .catch((error) => {
         console.error(error);
-        GlobalErrorContext.current.addErrorMsg("Not connected to the room.");
+        addErrorMsg("Not connected to the room.");
       });
   }
 
@@ -128,32 +87,15 @@ export default function ConsolePage() {
       .catch((error) => {
         console.error(error);
         if (error.code === "ERR_NETWORK") {
-          return GlobalErrorContext.current.addErrorMsg("Server error.");
+          return addErrorMsg("Server error.");
         }
         if (error.response.status === 401) {
           removeAuthToken();
           removeRoomId();
-          GlobalErrorContext.current.addErrorMsg("Please log in.");
+          addErrorMsg("Please log in.");
           navigate("/login");
         }
       });
-  }
-
-  function updatePlayStatus(currentSong, currentTime, isPlaying) {
-      client.publish({
-        destination: `/app/${roomId}/status.update`,
-        headers: { Type: "PLAYER" },
-        body: JSON.stringify({
-          currentSong: currentSong,
-          currentTime: currentTime,
-          isPlaying: isPlaying,
-        }),
-      });
-  }
-
-  function handlePlayAt(songId) {
-    // setCurrentSong(songId);
-    // updatePlayStatus(songId, 0, false);
   }
 
   function getProgrammeById(roomId) {
@@ -185,9 +127,7 @@ export default function ConsolePage() {
       })
       .catch((error) => {
         console.error(error);
-        GlobalErrorContext.current.addErrorMsg(
-          "Server error, please try again later."
-        );
+        addErrorMsg("Server error, please try again later.");
       });
   }
 
@@ -245,7 +185,7 @@ export default function ConsolePage() {
   }
 
   function sendMessage(chatMsg) {
-    if(client.connected){
+    if (client.connected) {
       client.publish({
         destination: `/app/${roomId}/chat`,
         body: JSON.stringify({
@@ -261,7 +201,7 @@ export default function ConsolePage() {
   useEffect(() => {
     if (!isAuthenticated()) {
       navigate("/login");
-      return GlobalErrorContext.current.addErrorMsg("Please log in.");
+      return addErrorMsg("Please log in.");
     } else {
       getRoomByUserId();
     }
@@ -297,33 +237,6 @@ export default function ConsolePage() {
     }
   }, [isOnline]);
 
-  useEffect(() => {
-    if (!currentSong) {
-      return;
-    }
-    base
-      .get("/song/getLyricsById", { params: { songId: currentSong } })
-      .then((response) => {
-        const newLyricList = response.data.data;
-        if (newLyricList) {
-          setLyric(newLyricList);
-        }
-      })
-      .catch((error) => {
-        console.error(error);
-      });
-
-    base
-      .get("/song/getAudioById", { params: { songId: currentSong } })
-      .then((response) => {
-        const newAudio = response.data.data;
-        setAudio(newAudio);
-      })
-      .catch((error) => {
-        console.error(error);
-      });
-  }, [currentSong]);
-
   return (
     <PlayerContextProvider>
       <div className="console-page">
@@ -350,11 +263,25 @@ export default function ConsolePage() {
           style={{ display: isLyricExpanded ? "none" : "" }}
           className="program-console-container"
         >
-          {ConsoleDisplay()}
+          {!isOnline ? (
+            <div className="offline-container">
+              <p id="info">Room Offline</p>
+              <button onClick={startLive}>Start Live</button>
+            </div>
+          ) : programList.length === 0 ? (
+            <p id="info">No program, please add.</p>
+          ) : (
+            programList.map((program, index) => (
+              <ProgramConsoleUnit
+                key={index}
+                program={program}
+                index={index}
+              />
+            ))
+          )}
         </div>
-        <Player audio={audio} isSeekable={true} />
+        <Player isSeekable={true} />
         <Lyric
-          lyric={lyric}
           isExpanded={isLyricExpanded}
           setIsExpanded={setIsLyricExpanded}
         />

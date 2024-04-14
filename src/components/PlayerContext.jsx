@@ -1,10 +1,11 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 
 const PlayerContext = createContext({
+  currentSong: null,
   currentTime: 0,
-  songDuration: 0,
   play: undefined,
   pause: undefined,
+  changeSong: undefined
 });
 
 export const usePlayerContext = () => {
@@ -12,11 +13,12 @@ export const usePlayerContext = () => {
 };
 
 export const PlayerContextProvider = ({ children }) => {
-  const [songDuration, setSongDuration] = useState(0);
+  const [currentSong, setCurrentSong] = useState({});
   const [currentTime, setCurrentTime] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
 
-  function changeSong(){
+  function changeSong(song){
+    setCurrentSong(song)
     setCurrentTime(0)
     setIsPlaying(false)
   }
@@ -33,9 +35,9 @@ export const PlayerContextProvider = ({ children }) => {
     let intervalId;
     if (isPlaying) {
       intervalId = setInterval(() => {
-        if (currentTime < songDuration) {
+        if (currentTime < currentSong.songDuration) {
           setCurrentTime((prevTime) => parseInt(prevTime) + 1);
-        } else if (currentTime === songDuration) {
+        } else if (currentTime === currentSong.songDuration) {
           setIsPlaying(false);
         }
       }, 1000);
@@ -48,10 +50,11 @@ export const PlayerContextProvider = ({ children }) => {
   return (
     <PlayerContext.Provider
       value={{
+        currentSong: currentSong,
         currentTime: currentTime,
-        songDuration: songDuration,
         play: play,
         pause: pause,
+        changeSong: changeSong
       }}
     >
       {children}

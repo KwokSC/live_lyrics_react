@@ -2,7 +2,7 @@ import React, { createContext, useContext, useState, useEffect } from "react";
 
 const GlobalErrorContext = createContext({
   errors: [],
-  setErrorMsg: undefined,
+  addErrorMsg: undefined,
   clearError: undefined,
 });
 
@@ -23,12 +23,10 @@ export const GlobalErrorProvider = ({ children }) => {
     setErrors((prevErrors) => prevErrors.filter((error) => error !== message));
   };
 
-
   useEffect(() => {
     const timer = setTimeout(() => {
       if (errors.length > 0) {
-        errors.map((error) => (clearError(error))
-        );
+        errors.map((error) => clearError(error));
       }
     }, 3000);
     return () => clearTimeout(timer);
@@ -36,7 +34,12 @@ export const GlobalErrorProvider = ({ children }) => {
 
   return (
     <GlobalErrorContext.Provider
-      value={{ errors: errors, addErrorMsg: addErrorMsg, clearError: clearError }}>
+      value={{
+        errors: errors,
+        addErrorMsg: addErrorMsg,
+        clearError: clearError,
+      }}
+    >
       {children}
     </GlobalErrorContext.Provider>
   );

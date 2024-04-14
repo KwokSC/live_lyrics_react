@@ -1,10 +1,16 @@
 import { useEffect, useRef, useState } from "react";
-import SeekBar from "./SeekBar";
 import { usePlayerContext } from "./PlayerContext";
+import { useGlobalError } from "./GlobalErrorContext";
+import client from "../requests/socket";
+import base from "../requests/base";
+import SeekBar from "./SeekBar";
 
-export default function Player({ isSeekable, audio }) {
+export default function Player({ isSeekable }) {
   const audioRef = useRef();
-  const { isPlaying } = usePlayerContext();
+  const [audio, setAudio] = useState("");
+  const { addErrorMsg } = useGlobalError();
+  const { currentSong, currentTime, isPlaying, changeSong, play, pause } =
+    usePlayerContext();
 
   function handleSeekBarChange(event) {}
 
@@ -17,6 +23,21 @@ export default function Player({ isSeekable, audio }) {
   function handleReplay() {}
 
   function handleEndLive() {}
+
+  useEffect(() => {
+    if (!currentSong.songId) {
+      return;
+    }
+    base
+      .get("/song/getAudioById", { params: { songId: currentSong.songId } })
+      .then((response) => {
+        const newAudio = response.data.data;
+        setAudio(newAudio);
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  }, [currentSong]);
 
   return (
     <div className="player-wrapper">
@@ -43,7 +64,7 @@ export default function Player({ isSeekable, audio }) {
           <i className="fi fi-br-r"></i>
         </button>
         <button onClick={handleEndLive}>
-        <i className="fi fi-sr-exit"></i>
+          <i className="fi fi-sr-exit"></i>
         </button>
       </div>
     </div>

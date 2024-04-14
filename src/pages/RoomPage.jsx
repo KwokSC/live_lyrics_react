@@ -11,6 +11,10 @@ import { useEffect, useState, useRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useGlobalError } from "../components/GlobalErrorContext.jsx";
 import {
+  PlayerContextProvider,
+  usePlayerContext,
+} from "../components/PlayerContext.jsx";
+import {
   getUserInfo,
   isAuthenticated,
   isGuest,
@@ -26,7 +30,7 @@ import DanmuScreen from "../components/DanmuScreen.jsx";
 export default function RoomPage() {
   const navigate = useNavigate();
   const { roomId } = useParams();
-  const GlobalErrorContext = useRef(useGlobalError());
+  const {addErrorMsg} = useGlobalError();
 
   const [navState, setNavState] = useState(false);
   const [reState, setReState] = useState(false);
@@ -49,7 +53,6 @@ export default function RoomPage() {
     songAlbum: "unknown",
     songDuration: 0,
   });
-  const [stompClient, setStompClient] = useState(null);
   const [programList, setProgramList] = useState([]);
   const [lyric, setLyric] = useState([]);
   const [albumCoverURL, setUrl] = useState("");
@@ -137,7 +140,7 @@ export default function RoomPage() {
       })
       .catch((error) => {
         console.error(error);
-        GlobalErrorContext.current.addErrorMsg(
+        addErrorMsg(
           "Server error, please try again later."
         );
       });
@@ -232,7 +235,6 @@ export default function RoomPage() {
       });
   }
 
-
   function connectToRoom() {
     client.onConnect = (frame) => {
       console.log(frame);
@@ -252,7 +254,7 @@ export default function RoomPage() {
   }
 
   function sendMessage(chatMsg) {
-    if(client.connected){
+    if (client.connected) {
       client.publish({
         destination: `/app/${roomId}/chat`,
         body: JSON.stringify({
@@ -275,7 +277,7 @@ export default function RoomPage() {
     getProgrammeById(roomId);
 
     return () => {
-      if(client.connected){
+      if (client.connected) {
         client.publish({
           destination: `/app/${roomId}/user.exit`,
           headers: {
@@ -284,7 +286,6 @@ export default function RoomPage() {
         });
         client.deactivate();
       }
-      
     };
     // eslint-disable-next-line
   }, []);
@@ -329,59 +330,59 @@ export default function RoomPage() {
   }, [roomId]);
 
   return (
-    <div className="room-page">
-      <Overlay
-        isCovered={navState || reState || doState}
-        onClick={() => {
-          setNavState(false);
-          setReState(false);
-          setDoState(false);
-        }}
-      />
-      <DanmuScreen messages={msgList} />
-      <HeadBar
-        navState={navState}
-        handleNavClick={() => {
-          setNavState(!navState);
-        }}
-        displayText={roomTitle}
-        handleBtnClick={() => {
-          setHoState(!hoState);
-        }}
-        buttonIcon={<i className="fi fi-rr-circle-user"></i>}
-      />
-      <NavBar navState={navState} navItemList={navItemList} />
-      <HostInfo
-        hoState={hoState}
-        setDoState={setDoState}
-        hostName={hostInfo.userName}
-        profileImg={hostInfo.profileImg}
-        summary={hostInfo.summary}
-      />
-      <DonationWindow doState={doState} setDoState={setDoState} />
-      <SongInfo
-        songInfo={songInfo}
-        albumCoverURL={albumCoverURL}
-        isLyricExpanded={isLyricExpanded}
-      />
-      <SeekBar isSeekable={false} />
-      <Lyric
-        lyric={lyric}
-        isExpanded={isLyricExpanded}
-        setIsExpanded={setIsLyricExpanded}
-      />
-      <RoomUserPanel
-        isExpanded={panelState}
-        setIsExpanded={setPanelState}
-        users={users}
-        sendMessage={sendMessage}
-      />
-      <Recommendation
-        reState={reState}
-        onReClick={() => {
-          setReState(!reState);
-        }}
-      />
-    </div>
+      <div className="room-page">
+        <Overlay
+          isCovered={navState || reState || doState}
+          onClick={() => {
+            setNavState(false);
+            setReState(false);
+            setDoState(false);
+          }}
+        />
+        <DanmuScreen messages={msgList} />
+        <HeadBar
+          navState={navState}
+          handleNavClick={() => {
+            setNavState(!navState);
+          }}
+          displayText={roomTitle}
+          handleBtnClick={() => {
+            setHoState(!hoState);
+          }}
+          buttonIcon={<i className="fi fi-rr-circle-user"></i>}
+        />
+        <NavBar navState={navState} navItemList={navItemList} />
+        <HostInfo
+          hoState={hoState}
+          setDoState={setDoState}
+          hostName={hostInfo.userName}
+          profileImg={hostInfo.profileImg}
+          summary={hostInfo.summary}
+        />
+        <DonationWindow doState={doState} setDoState={setDoState} />
+        <SongInfo
+          songInfo={songInfo}
+          albumCoverURL={albumCoverURL}
+          isLyricExpanded={isLyricExpanded}
+        />
+        <SeekBar isSeekable={false} />
+        <Lyric
+          lyric={lyric}
+          isExpanded={isLyricExpanded}
+          setIsExpanded={setIsLyricExpanded}
+        />
+        <RoomUserPanel
+          isExpanded={panelState}
+          setIsExpanded={setPanelState}
+          users={users}
+          sendMessage={sendMessage}
+        />
+        <Recommendation
+          reState={reState}
+          onReClick={() => {
+            setReState(!reState);
+          }}
+        />
+      </div>
   );
 }

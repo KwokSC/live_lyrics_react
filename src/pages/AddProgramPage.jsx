@@ -101,7 +101,7 @@ export default function AddProgramPage() {
       songId: "song_" + newProgramId,
       recommendations: recommendationList,
     };
-    api.post("/program/uploadProgram", program, {
+    return api.post("/program/uploadProgram", program, {
       params: {
         roomId: getRoomId(),
       },
@@ -110,17 +110,17 @@ export default function AddProgramPage() {
 
   async function uploadImg() {
     const imgFormData = transformFile(albumCover, "album", imgType);
-    api.post("/song/uploadAlbumCover", imgFormData);
+    return api.post("/song/uploadAlbumCover", imgFormData);
   }
 
   async function uploadAudio() {
     const audioFormData = transformFile(audio, "audio", audioType);
-    api.post("/song/uploadAudio", audioFormData);
+    return api.post("/song/uploadAudio", audioFormData);
   }
 
   async function uploadLyric() {
     const lyricFormData = transformLyrics(lyricList);
-    api.post("/song/uploadLyric", lyricFormData);
+    return api.post("/song/uploadLyric", lyricFormData);
   }
 
   function validateForm() {

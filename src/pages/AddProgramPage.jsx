@@ -21,6 +21,7 @@ export default function AddProgramPage() {
 
   const [isModalOpen, setIsOpen] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
+  const [uploadProgress, setProgress] = useState(0);
   const [newProgramId, setNewId] = useState(undefined);
   const [songName, setSongName] = useState("");
   const [songArtist, setSongArtist] = useState("");
@@ -33,7 +34,6 @@ export default function AddProgramPage() {
   const [lyricList, setLyricList] = useState([]);
   const [recommendationList, setRecommendationList] = useState([]);
   const statusTextRef = useRef();
-  const statusProgressRef = useRef();
   const statusImgRef = useRef();
 
   const uploadingWindow = (
@@ -41,11 +41,13 @@ export default function AddProgramPage() {
       <div className="pop-modal" style={{ display: isModalOpen ? "" : "none" }}>
         <p ref={statusTextRef}></p>
         <input
-          ref={statusProgressRef}
           type="range"
           className="seek-bar"
           step={1}
           min={0}
+          max={5}
+          value={uploadProgress}
+          readOnly
         />
         <i ref={statusImgRef}></i>
       </div>
@@ -83,7 +85,7 @@ export default function AddProgramPage() {
     return formData;
   }
 
-  async function uploadSong(progress) {
+  async function uploadSong() {
     const song = {
       songId: "song_" + newProgramId,
       songName: songName,
@@ -91,79 +93,34 @@ export default function AddProgramPage() {
       songArtist: songArtist,
       songDuration: songDuration,
     };
-    await api
-      .post("/song/uploadSong", song)
-      .then((response) => {
-        if (response.status === 200) {
-          progress++;
-        }
-      })
-      .catch((error) => {
-        console.error(error);
-      });
+    return api.post("/song/uploadSong", song);
   }
 
-  async function uploadProgram(progress) {
+  async function uploadProgram() {
     const program = {
       songId: "song_" + newProgramId,
       recommendations: recommendationList,
     };
-    await api
-      .post("/program/uploadProgram", program, {
-        params: {
-          roomId: getRoomId(),
-        },
-      })
-      .then((response) => {
-        if (response.status === 200) {
-          progress++;
-        }
-      })
-      .catch((error) => {
-        console.error(error);
-      });
+    api.post("/program/uploadProgram", program, {
+      params: {
+        roomId: getRoomId(),
+      },
+    });
   }
 
-  async function uploadImg(progress) {
+  async function uploadImg() {
     const imgFormData = transformFile(albumCover, "album", imgType);
-    await api
-      .post("/song/uploadAlbumCover", imgFormData)
-      .then((response) => {
-        if (response.status === 200) {
-          progress++;
-        }
-      })
-      .catch((error) => {
-        console.error(error);
-      });
+    return api.post("/song/uploadAlbumCover", imgFormData);
   }
 
-  async function uploadAudio(progress) {
+  async function uploadAudio() {
     const audioFormData = transformFile(audio, "audio", audioType);
-    await api
-      .post("/song/uploadAudio", audioFormData)
-      .then((response) => {
-        if (response.status === 200) {
-          progress++;
-        }
-      })
-      .catch((error) => {
-        console.error(error);
-      });
+    return api.post("/song/uploadAudio", audioFormData);
   }
 
-  async function uploadLyric(progress) {
+  async function uploadLyric() {
     const lyricFormData = transformLyrics(lyricList);
-    await api
-      .post("/song/uploadLyric", lyricFormData)
-      .then((response) => {
-        if (response.status === 200) {
-          progress++;
-        }
-      })
-      .catch((error) => {
-        console.error(error);
-      });
+    return api.post("/song/uploadLyric", lyricFormData);
   }
 
   function validateForm() {
@@ -261,16 +218,51 @@ export default function AddProgramPage() {
   }
 
   async function handleSubmitAsync() {
-    let completedRequests = 0;
-    statusProgressRef.current.max = 5;
-    statusProgressRef.current.value = completedRequests;
-    await Promise.all([
-      // uploadSong(completedRequests),
-      // uploadProgram(completedRequests),
-      uploadImg(completedRequests),
-      uploadAudio(completedRequests),
-      uploadLyric(completedRequests),
-    ]);
+    setIsOpen(true);
+    setIsUploading(true);
+
+    try {
+      const songResponse = await uploadSong();
+      if (songResponse.status === 200) {
+        setProgress((prevProgress) => prevProgress + 1);
+      }
+
+      const programResponse = await uploadProgram();
+      if (programResponse.status === 200) {
+        setProgress((prevProgress) => prevProgress + 1);
+      }
+
+      const imgResponse = await uploadImg();
+      if (imgResponse.status === 200) {
+        setProgress((prevProgress) => prevProgress + 1);
+      }
+
+      const audioResponse = await uploadAudio();
+      if (audioResponse.status === 200) {
+        setProgress((prevProgress) => prevProgress + 1);
+      }
+
+      const lyricResponse = await uploadLyric();
+      if (lyricResponse.status === 200) {
+        setProgress((prevProgress) => prevProgress + 1);
+      }
+    } catch (error) {
+      console.error(error);
+    }
+    setIsUploading(false);
+
+    if (uploadProgress === 5) {
+      statusTextRef.current.innerText =
+        "Congrats! You new program was uploaded successfully.";
+      statusImgRef.current.className = "fi fi-rr-cloud-check";
+      // setTimeout(() => {
+      //   navigate("/program");
+      // }, 3000);
+    } else {
+      statusTextRef.current.innerText =
+        "Sorry we failed to upload the program, please try again.";
+      statusImgRef.current.className = "fi fi-rr-cloud-exclamation";
+    }
   }
 
   function handleLangSelectChange(event, index) {
@@ -318,7 +310,7 @@ export default function AddProgramPage() {
   function handleAlbumSelect(event) {
     const file = event.target.files[0];
     if (!file) return;
-    setImgType(file.type)
+    setImgType(file.type);
     const reader = new FileReader();
     reader.onload = function (event) {
       setAlbumCover(event.target.result);
@@ -329,7 +321,7 @@ export default function AddProgramPage() {
   function handleAudioSelect(event) {
     const file = event.target.files[0];
     if (!file) return;
-    setAudioType(file.type)
+    setAudioType(file.type);
     const audio = new Audio();
     audio.src = URL.createObjectURL(file);
     audio.addEventListener("loadedmetadata", () => {

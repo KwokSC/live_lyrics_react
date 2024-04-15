@@ -223,27 +223,27 @@ export default function AddProgramPage() {
 
     try {
       const songResponse = await uploadSong();
-      if (songResponse.status === 200) {
+      if (songResponse.data.code === 200) {
         setProgress((prevProgress) => prevProgress + 1);
       }
 
       const programResponse = await uploadProgram();
-      if (programResponse.status === 200) {
+      if (programResponse.data.code === 200) {
         setProgress((prevProgress) => prevProgress + 1);
       }
 
       const imgResponse = await uploadImg();
-      if (imgResponse.status === 200) {
+      if (imgResponse.data.code === 200) {
         setProgress((prevProgress) => prevProgress + 1);
       }
 
       const audioResponse = await uploadAudio();
-      if (audioResponse.status === 200) {
+      if (audioResponse.data.code === 200) {
         setProgress((prevProgress) => prevProgress + 1);
       }
 
       const lyricResponse = await uploadLyric();
-      if (lyricResponse.status === 200) {
+      if (lyricResponse.data.code === 200) {
         setProgress((prevProgress) => prevProgress + 1);
       }
     } catch (error) {

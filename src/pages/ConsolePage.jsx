@@ -7,7 +7,6 @@ import NavBar from "../components/NavBar.jsx";
 import Player from "../components/Player.jsx";
 import Lyric from "../components/Lyric.jsx";
 import ProgramConsoleUnit from "../components/ProgramConsoleUnit.jsx";
-import { PlayerContextProvider } from "../components/PlayerContext.jsx";
 import { useGlobalError } from "../components/GlobalErrorContext.jsx";
 import {
   isAuthenticated,
@@ -238,60 +237,51 @@ export default function ConsolePage() {
   }, [isOnline]);
 
   return (
-    <PlayerContextProvider>
-      <div className="console-page">
-        <DanmuScreen messages={msgList} />
-        <Overlay
-          isCovered={navState}
-          onClick={() => {
-            setNavState(false);
-          }}
-        />
-        <HeadBar
-          navState={navState}
-          handleNavClick={() => {
-            setNavState(!navState);
-          }}
-          displayText={roomTitle}
-          handleBtnClick={() => {
-            navigate("/program");
-          }}
-          buttonIcon={<i className="fi fi-sr-album"></i>}
-        />
-        <NavBar navState={navState} navItemList={navItemList} />
-        <div
-          style={{ display: isLyricExpanded ? "none" : "" }}
-          className="program-console-container"
-        >
-          {!isOnline ? (
-            <div className="offline-container">
-              <p id="info">Room Offline</p>
-              <button onClick={startLive}>Start Live</button>
-            </div>
-          ) : programList.length === 0 ? (
-            <p id="info">No program, please add.</p>
-          ) : (
-            programList.map((program, index) => (
-              <ProgramConsoleUnit
-                key={index}
-                program={program}
-                index={index}
-              />
-            ))
-          )}
-        </div>
-        <Player isSeekable={true} />
-        <Lyric
-          isExpanded={isLyricExpanded}
-          setIsExpanded={setIsLyricExpanded}
-        />
-        <RoomUserPanel
-          isExpanded={panelState}
-          setIsExpanded={setPanelState}
-          users={users}
-          sendMessage={sendMessage}
-        />
+    <div className="console-page">
+      <DanmuScreen messages={msgList} />
+      <Overlay
+        isCovered={navState}
+        onClick={() => {
+          setNavState(false);
+        }}
+      />
+      <HeadBar
+        navState={navState}
+        handleNavClick={() => {
+          setNavState(!navState);
+        }}
+        displayText={roomTitle}
+        handleBtnClick={() => {
+          navigate("/program");
+        }}
+        buttonIcon={<i className="fi fi-sr-album"></i>}
+      />
+      <NavBar navState={navState} navItemList={navItemList} />
+      <div
+        style={{ display: isLyricExpanded ? "none" : "" }}
+        className="program-console-container"
+      >
+        {!isOnline ? (
+          <div className="offline-container">
+            <p id="info">Room Offline</p>
+            <button onClick={startLive}>Start Live</button>
+          </div>
+        ) : programList.length === 0 ? (
+          <p id="info">No program, please add.</p>
+        ) : (
+          programList.map((program, index) => (
+            <ProgramConsoleUnit key={index} program={program} index={index} />
+          ))
+        )}
       </div>
-    </PlayerContextProvider>
+      <Player isSeekable={true} />
+      <Lyric isExpanded={isLyricExpanded} setIsExpanded={setIsLyricExpanded} />
+      <RoomUserPanel
+        isExpanded={panelState}
+        setIsExpanded={setPanelState}
+        users={users}
+        sendMessage={sendMessage}
+      />
+    </div>
   );
 }

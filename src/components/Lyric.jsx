@@ -19,7 +19,7 @@ export default function Lyric({ isExpanded, setIsExpanded }) {
     if (lyricContent) {
       const strArr = lyricContent.split("\n");
       strArr.forEach((item) => {
-        const timeRegex = /\[(\d{2}:\d{2}\.\d{2})\]/;
+        const timeRegex = /\[(\d{2}:\d{2}\.\d{2,3})\]/;
         const match = item.match(timeRegex);
         if (match) {
           timeArr.push(timeFormat(match[1]));
@@ -69,6 +69,20 @@ export default function Lyric({ isExpanded, setIsExpanded }) {
     }
   }
 
+  function getLyricsById(id) {
+    base
+      .get("/song/getLyricsById", { params: { songId: id } })
+      .then((response) => {
+        const newLyricList = response.data.data;
+        if (newLyricList) {
+          setLyric(newLyricList);
+        }
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  }
+
   useEffect(() => {
     const userLanguage = navigator.language || navigator.userLanguage;
     switch (true) {
@@ -103,20 +117,10 @@ export default function Lyric({ isExpanded, setIsExpanded }) {
   }, [language, lyric]);
 
   useEffect(() => {
-    if (!currentSong.songId) {
+    if (!currentSong || !currentSong.songId) {
       return;
     }
-    base
-      .get("/song/getLyricsById", { params: { songId: currentSong.songId } })
-      .then((response) => {
-        const newLyricList = response.data.data;
-        if (newLyricList) {
-          setLyric(newLyricList);
-        }
-      })
-      .catch((error) => {
-        console.error(error);
-      });
+    getLyricsById(currentSong.songId);
   }, [currentSong]);
 
   return (
@@ -136,7 +140,10 @@ export default function Lyric({ isExpanded, setIsExpanded }) {
       <ul className="lyric-content" ref={lyricContentRef}>
         {lyricContent.map((line, index) => (
           <li
-            className={index === getCurrentLyricIndex() ? "highlight" : ""}
+            className={
+              ([index === getCurrentLyricIndex() ? "highlight" : "",
+              isExpanded ? "expanded" : ""].join(' '))
+            }
             key={index}
           >
             {line}

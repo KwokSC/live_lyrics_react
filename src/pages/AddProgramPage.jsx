@@ -12,7 +12,7 @@ import {
   storeRoomId,
   getRoomId,
 } from "../utils/cookie.jsx";
-import PopModal from "../components/PopModal.jsx"
+import PopModal from "../components/PopModal.jsx";
 import Overlay from "../components/Overlay.jsx";
 
 export default function AddProgramPage() {
@@ -27,16 +27,26 @@ export default function AddProgramPage() {
   const [songAlbum, setSongAlbum] = useState("");
   const [songDuration, setDuration] = useState(0);
   const [albumCover, setAlbumCover] = useState(null);
+  const [imgType, setImgType] = useState("");
   const [audio, setAudio] = useState(null);
+  const [audioType, setAudioType] = useState("");
   const [lyricList, setLyricList] = useState([]);
   const [recommendationList, setRecommendationList] = useState([]);
   const statusTextRef = useRef();
+  const statusProgressRef = useRef();
   const statusImgRef = useRef();
 
   const uploadingWindow = (
     <>
       <div className="pop-modal" style={{ display: isModalOpen ? "" : "none" }}>
         <p ref={statusTextRef}></p>
+        <input
+          ref={statusProgressRef}
+          type="range"
+          className="seek-bar"
+          step={1}
+          min={0}
+        />
         <i ref={statusImgRef}></i>
       </div>
       <Overlay
@@ -51,12 +61,12 @@ export default function AddProgramPage() {
     </>
   );
 
-  function transformFile(file, filePrefix) {
+  function transformFile(file, filePrefix, type) {
     if (!file) {
       return null;
     }
     const formData = new FormData();
-    const blob = new Blob([file], { type: file.type });
+    const blob = new Blob([file], { type: type });
     formData.append(filePrefix, blob, filePrefix + "_" + newProgramId);
     return formData;
   }
@@ -67,13 +77,13 @@ export default function AddProgramPage() {
       if (!item.file) {
         return;
       }
-      const blob = new Blob([item.file], { type: item.file.type });
+      const blob = new Blob([item.file], { type: "text/plain" });
       formData.append("lyric", blob, "lyric_" + item.lang + "_" + newProgramId);
     });
     return formData;
   }
 
-  function uploadSong() {
+  async function uploadSong(progress) {
     const song = {
       songId: "song_" + newProgramId,
       songName: songName,
@@ -81,34 +91,79 @@ export default function AddProgramPage() {
       songArtist: songArtist,
       songDuration: songDuration,
     };
-    return api.post("/song/uploadSong", song);
+    await api
+      .post("/song/uploadSong", song)
+      .then((response) => {
+        if (response.status === 200) {
+          progress++;
+        }
+      })
+      .catch((error) => {
+        console.error(error);
+      });
   }
 
-  function uploadProgram() {
+  async function uploadProgram(progress) {
     const program = {
       songId: "song_" + newProgramId,
       recommendations: recommendationList,
     };
-    return api.post("/program/uploadProgram", program, {
-      params: {
-        roomId: getRoomId(),
-      },
-    });
+    await api
+      .post("/program/uploadProgram", program, {
+        params: {
+          roomId: getRoomId(),
+        },
+      })
+      .then((response) => {
+        if (response.status === 200) {
+          progress++;
+        }
+      })
+      .catch((error) => {
+        console.error(error);
+      });
   }
 
-  function uploadFiles(endpointsAndDataArray) {
-    const uploadPromises = endpointsAndDataArray.map(
-      ({ endPoint, formData }) => {
-        return new Promise((resolve, reject) => {
-          api
-            .post(endPoint, formData)
-            .then((response) => resolve(response.data))
-            .catch((error) => reject(error));
-        });
-      }
-    );
+  async function uploadImg(progress) {
+    const imgFormData = transformFile(albumCover, "album", imgType);
+    await api
+      .post("/song/uploadAlbumCover", imgFormData)
+      .then((response) => {
+        if (response.status === 200) {
+          progress++;
+        }
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  }
 
-    return Promise.all(uploadPromises);
+  async function uploadAudio(progress) {
+    const audioFormData = transformFile(audio, "audio", audioType);
+    await api
+      .post("/song/uploadAudio", audioFormData)
+      .then((response) => {
+        if (response.status === 200) {
+          progress++;
+        }
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  }
+
+  async function uploadLyric(progress) {
+    const lyricFormData = transformLyrics(lyricList);
+    await api
+      .post("/song/uploadLyric", lyricFormData)
+      .then((response) => {
+        if (response.status === 200) {
+          progress++;
+        }
+      })
+      .catch((error) => {
+        console.error(error);
+      });
   }
 
   function validateForm() {
@@ -138,7 +193,7 @@ export default function AddProgramPage() {
       return;
     }
 
-    setIsOpen(true)
+    setIsOpen(true);
     setIsUploading(true);
     statusTextRef.current.innerText =
       "New program is uploading, please do not close the window...";
@@ -160,18 +215,29 @@ export default function AddProgramPage() {
     formData.append("roomId", getRoomId());
     formData.append("song", JSON.stringify(song));
     formData.append("program", JSON.stringify(program));
-    const audioBlob = new Blob([audio], { type: audio.type });
-    const imgBlob = new Blob([albumCover], { type: albumCover.type });
-    formData.append("audio", audioBlob, "audio_" + newProgramId);
-    formData.append("album", imgBlob, "album_" + newProgramId);
+    if (audio) {
+      const audioBlob = new Blob([audio], { type: audio.type });
+      formData.append("audio", audioBlob, "audio_" + newProgramId);
+    }
 
-    lyricList.forEach((item) => {
-      if (!item.file) {
-        return;
-      }
-      const blob = new Blob([item.file], { type: "text/plain" });
-      formData.append("lyric", blob, "lyric_" + item.lang + "_" + newProgramId);
-    });
+    if (albumCover) {
+      const imgBlob = new Blob([albumCover], { type: albumCover.type });
+      formData.append("album", imgBlob, "album_" + newProgramId);
+    }
+
+    if (lyricList.length !== 0) {
+      lyricList.forEach((item) => {
+        if (!item.file) {
+          return;
+        }
+        const blob = new Blob([item.file], { type: "text/plain" });
+        formData.append(
+          "lyric",
+          blob,
+          "lyric_" + item.lang + "_" + newProgramId
+        );
+      });
+    }
 
     api
       .post("/song/submit", formData)
@@ -186,7 +252,7 @@ export default function AddProgramPage() {
         }
       })
       .catch((error) => {
-        setIsUploading(false)
+        setIsUploading(false);
         statusTextRef.current.innerText =
           "Sorry we failed to upload the program, please try again.";
         statusImgRef.current.className = "fi fi-rr-cloud-exclamation";
@@ -194,7 +260,18 @@ export default function AddProgramPage() {
       });
   }
 
-  async function submitAsync() {}
+  async function handleSubmitAsync() {
+    let completedRequests = 0;
+    statusProgressRef.current.max = 5;
+    statusProgressRef.current.value = completedRequests;
+    await Promise.all([
+      // uploadSong(completedRequests),
+      // uploadProgram(completedRequests),
+      uploadImg(completedRequests),
+      uploadAudio(completedRequests),
+      uploadLyric(completedRequests),
+    ]);
+  }
 
   function handleLangSelectChange(event, index) {
     const updatedList = [...lyricList];
@@ -241,6 +318,7 @@ export default function AddProgramPage() {
   function handleAlbumSelect(event) {
     const file = event.target.files[0];
     if (!file) return;
+    setImgType(file.type)
     const reader = new FileReader();
     reader.onload = function (event) {
       setAlbumCover(event.target.result);
@@ -251,6 +329,7 @@ export default function AddProgramPage() {
   function handleAudioSelect(event) {
     const file = event.target.files[0];
     if (!file) return;
+    setAudioType(file.type)
     const audio = new Audio();
     audio.src = URL.createObjectURL(file);
     audio.addEventListener("loadedmetadata", () => {
@@ -305,7 +384,7 @@ export default function AddProgramPage() {
       <div className="program-bar">
         <button onClick={() => navigate("/program")}>&#x00AB;</button>
         <p>New Program</p>
-        <button disabled={isUploading} onClick={() => handleSubmit()}>
+        <button disabled={isUploading} onClick={() => handleSubmitAsync()}>
           &#x2713;
         </button>
       </div>
@@ -390,7 +469,7 @@ export default function AddProgramPage() {
               <input
                 id={`lrc-upload-${index}`}
                 type="file"
-                accept=".lrc"
+                accept="text/*"
                 onChange={(e) => handleLyricSelect(e, index)}
               />
             </button>

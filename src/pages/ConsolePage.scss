@@ -12,16 +12,17 @@
   flex-direction: row;
   align-items: center;
   justify-content: center;
-}
-
-.player-button button {
-  aspect-ratio: 1;
-  width: 50px;
-  border-radius: 50%;
-  border: none;
-  background-color: $primary-color;
-  color: $secondary-color;
-  margin: 5px;
+  z-index: 1;
+  button {
+    aspect-ratio: 1;
+    width: 50px;
+    border-radius: 50%;
+    border: none;
+    background-color: $primary-color;
+    color: $secondary-color;
+    margin: 5px;
+    cursor: pointer;
+  }
 }
 
 button i {
@@ -61,6 +62,7 @@ button i {
     align-items: center;
     justify-items: center;
     padding-inline: 10px;
+    margin-block: 5px;
     font-family: Georgia, "Times New Roman", Times, serif;
   
     .program-index {

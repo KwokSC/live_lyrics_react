@@ -3,11 +3,9 @@ import { usePlayerContext } from "./PlayerContext";
 import { useGlobalError } from "./GlobalErrorContext";
 import client from "../requests/socket";
 
-export default function ProgramConsoleUnit({
-  program,
-  index,
-}) {
+export default function ProgramConsoleUnit({ program, index }) {
   const [isIndexHovered, setIsHovered] = useState(false);
+  const [isCurrentSong, setIsCurrent] = useState(false);
   const { currentSong, changeSong } = usePlayerContext();
   const { addErrorMsg } = useGlobalError();
 
@@ -16,13 +14,25 @@ export default function ProgramConsoleUnit({
       addErrorMsg("You are not connected to the room.");
       return;
     }
-    changeSong(song);
+    if (!currentSong || song.songId !== currentSong.songId) {
+      changeSong(song);
+    }
   }
+
+  useEffect(() => {
+    if (currentSong && currentSong.songId === program.song.songId) {
+      setIsCurrent(true)
+    }else{
+      setIsCurrent(false)
+    }
+  }, [currentSong]);
 
   return (
     <div
       className={`program-console-unit ${
-        program.song.songId === currentSong.songId ? "active" : ""
+        currentSong && program.song.songId === currentSong.songId
+          ? "active"
+          : ""
       }`}
     >
       <button
@@ -30,9 +40,8 @@ export default function ProgramConsoleUnit({
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
         onClick={() => handlePlayAt(program.song)}
-        disabled={program.song.songId === currentSong.songId}
       >
-        {isIndexHovered || program.song.songId === currentSong.songId ? (
+        {isIndexHovered || isCurrentSong ? (
           <i className="fi fi-rr-play"></i>
         ) : (
           index + 1

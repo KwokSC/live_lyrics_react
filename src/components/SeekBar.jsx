@@ -7,7 +7,7 @@ export default function SeekBar({ isSeekable, handleSeekBarChange }) {
   const { currentTime, currentSong } = usePlayerContext();
 
   useEffect(() => {
-    if(currentSong.songDuration){
+    if(currentSong && currentSong.songDuration){
       const songSecond = parseInt(currentSong.songDuration % 60);
       const songMinute = parseInt((currentSong.songDuration / 60) % 60);
       setDurationDisplay(songMinute + ":" + songSecond);
@@ -31,7 +31,7 @@ export default function SeekBar({ isSeekable, handleSeekBarChange }) {
         step={1}
         value={currentTime}
         min={0}
-        max={currentSong.songDuration}
+        max={currentSong?currentSong.songDuration:"0:0"}
         readOnly={!isSeekable}
         onChange={isSeekable ? handleSeekBarChange : null}
       />

@@ -37,7 +37,6 @@ body {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  z-index: 100;
   width: 100vw;
   z-index: 4;
   .error-content {
@@ -230,7 +229,7 @@ body {
     height: 10px;
     width: 10px;
     border-radius: 50%;
-    box-shadow: -100vw 0 0 99vw $primary-color;
+    box-shadow: -100vw 0 0 100vw $primary-color;
   }
   span {
     width: 10%;
@@ -265,6 +264,7 @@ body {
     color: $primary-color;
     transition: 0.3s;
     cursor: pointer;
+    z-index: 2;
   }
   button:hover {
     color: $secondary-color;
@@ -288,14 +288,14 @@ body {
     li {
       text-shadow: 1px 1px 10px rgba(128, 128, 128, 0.5);
       text-align: center;
-      font-size: 2vh;
+      font-size: 20px;
       margin-block: 5px;
       color: $secondary-color;
       transition: 0.5s;
     }
     li.highlight {
       width: 100%;
-      font-size: 2.5vh;
+      font-size: 30px;
       color: $primary-color;
       background-image: linear-gradient(
         to left,
@@ -304,6 +304,12 @@ body {
         $secondary-color,
         transparent
       );
+    }
+    li.expanded{
+      font-size: 30px;
+    }
+    li.expanded.highlight{
+      font-size: 40px;
     }
   }
 }
@@ -330,7 +336,7 @@ body {
   justify-content: center;
   border-radius: 10px;
   background-color: $secondary-color;
-  transition: opacity 0.3s ease;
+  z-index: 2;
   li {
     border-radius: 10px;
     color: $primary-color;
@@ -492,8 +498,7 @@ body {
   }
 
   .expanded-panel.hidden {
-    transform-origin: left bottom;
-    transform: scale(0);
+    display: none;
   }
 }
 

@@ -13,15 +13,16 @@ export default function LangBar({ language, setLanguage }) {
     <div className="lang-bar">
       <button onClick={() => setListVisible(!isListVisible)}>{language}</button>
 
-      {isListVisible && (
-        <ul className="lang-selector">
-          {languageOptions.map((language) => (
-            <li key={language} onClick={() => handleLanguageSelect(language)}>
-              {language}
-            </li>
-          ))}
-        </ul>
-      )}
+      <ul
+        style={{ display: isListVisible ? "" : "none" }}
+        className="lang-selector"
+      >
+        {languageOptions.map((language) => (
+          <li key={language} onClick={() => handleLanguageSelect(language)}>
+            {language}
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }

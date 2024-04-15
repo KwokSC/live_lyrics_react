@@ -110,17 +110,17 @@ export default function AddProgramPage() {
 
   async function uploadImg() {
     const imgFormData = transformFile(albumCover, "album", imgType);
-    return api.post("/song/uploadAlbumCover", imgFormData);
+    api.post("/song/uploadAlbumCover", imgFormData);
   }
 
   async function uploadAudio() {
     const audioFormData = transformFile(audio, "audio", audioType);
-    return api.post("/song/uploadAudio", audioFormData);
+    api.post("/song/uploadAudio", audioFormData);
   }
 
   async function uploadLyric() {
     const lyricFormData = transformLyrics(lyricList);
-    return api.post("/song/uploadLyric", lyricFormData);
+    api.post("/song/uploadLyric", lyricFormData);
   }
 
   function validateForm() {
@@ -223,27 +223,27 @@ export default function AddProgramPage() {
 
     try {
       const songResponse = await uploadSong();
-      if (songResponse.data.code === 200) {
+      if (songResponse.status === 200) {
         setProgress((prevProgress) => prevProgress + 1);
       }
 
       const programResponse = await uploadProgram();
-      if (programResponse.data.code === 200) {
+      if (programResponse.status === 200) {
         setProgress((prevProgress) => prevProgress + 1);
       }
 
       const imgResponse = await uploadImg();
-      if (imgResponse.data.code === 200) {
+      if (imgResponse.status === 200) {
         setProgress((prevProgress) => prevProgress + 1);
       }
 
       const audioResponse = await uploadAudio();
-      if (audioResponse.data.code === 200) {
+      if (audioResponse.status === 200) {
         setProgress((prevProgress) => prevProgress + 1);
       }
 
       const lyricResponse = await uploadLyric();
-      if (lyricResponse.data.code === 200) {
+      if (lyricResponse.status === 200) {
         setProgress((prevProgress) => prevProgress + 1);
       }
     } catch (error) {

@@ -3,6 +3,8 @@ import { getRoomId } from "../utils/cookie";
 import client from "../requests/socket";
 
 const PlayerContext = createContext({
+  programList: [],
+  setProgramList: undefined,
   currentSong: null,
   setCurrentSong: undefined,
   currentTime: 0,
@@ -21,6 +23,7 @@ export const usePlayerContext = () => {
 };
 
 export const PlayerContextProvider = ({ children }) => {
+  const [programList, setProgramList] = useState([]);
   const [currentSong, setCurrentSong] = useState(null);
   const [currentTime, setCurrentTime] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -90,6 +93,8 @@ export const PlayerContextProvider = ({ children }) => {
   return (
     <PlayerContext.Provider
       value={{
+        programList:programList,
+        setProgramList: setProgramList,
         currentSong: currentSong,
         setCurrentSong: setCurrentSong,
         currentTime: currentTime,

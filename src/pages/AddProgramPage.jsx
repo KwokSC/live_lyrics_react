@@ -34,12 +34,14 @@ export default function AddProgramPage() {
   const [recommendationList, setRecommendationList] = useState([]);
   const statusTextRef = useRef();
   const statusImgRef = useRef();
+  const statusProgressRef = useRef();
 
   const uploadingWindow = (
     <>
       <div className="pop-modal" style={{ display: isModalOpen ? "" : "none" }}>
         <p ref={statusTextRef}></p>
         <input
+          ref={statusProgressRef}
           type="range"
           className="seek-bar"
           step={1}
@@ -250,19 +252,18 @@ export default function AddProgramPage() {
       if (lyricResponse.status === 200) {
         setProgress((prevProgress) => prevProgress + 1);
       }
-
     } catch (error) {
       console.error(error);
     }
     setIsUploading(false);
 
-    if (uploadProgress === 5) {
+    if (statusProgressRef.current.value === 5) {
       statusTextRef.current.innerText =
         "Congrats! You new program was uploaded successfully.";
       statusImgRef.current.className = "fi fi-rr-cloud-check";
-      // setTimeout(() => {
-      //   navigate("/program");
-      // }, 3000);
+      setTimeout(() => {
+        navigate("/program");
+      }, 3000);
     } else {
       statusTextRef.current.innerText =
         "Sorry we failed to upload the program, please try again.";
@@ -380,11 +381,11 @@ export default function AddProgramPage() {
     setNewId(uuidv4().slice(0, 12));
   }, []);
 
-  useEffect(()=>{
-    if(isUploading){
-      statusTextRef.current.innerText = "Uploading..."
+  useEffect(() => {
+    if (isUploading) {
+      statusTextRef.current.innerText = "Uploading...";
     }
-  },[isUploading])
+  }, [isUploading]);
 
   return (
     <div className="add-program-page">

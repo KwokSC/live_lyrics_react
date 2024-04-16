@@ -28,7 +28,7 @@
     min-width: 300px;
     max-width: 500px;
     height: 30%;
-    min-height: 200px;
+    min-height: 250px;
     max-height: 300px;
     box-shadow: 5px 5px 5px rgba(0, 0, 0, 0.1);
     .room-header {
@@ -106,5 +106,16 @@
         }
       }
     }
+  }
+}
+
+@media (max-width: 500px) {
+  img{
+    display: none;
+  }
+}
+@media (max-width: 350px) {
+  .summary{
+    display: none;
   }
 }

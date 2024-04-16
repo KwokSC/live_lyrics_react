@@ -9,7 +9,7 @@ export default function RoomUserInfo({ user }) {
         )}
       </div>
       <p style={{ fontSize: "12px" }}>{user.userName}</p>
-      <p style={{ fontSize: "10px", fontStyle: "italic", marginTop: "3px" }}>
+      <p style={{ fontSize: "10px", fontStyle: "italic", marginTop: "2px" }}>
         {"@" + user.userAccount}
       </p>
     </div>

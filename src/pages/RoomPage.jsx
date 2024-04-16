@@ -28,7 +28,7 @@ export default function RoomPage() {
   const navigate = useNavigate();
   const { roomId } = useParams();
   const { addErrorMsg } = useGlobalError();
-  const { setCurrentSong, setCurrentTime, setIsPlaying } = usePlayerContext();
+  const { setProgramList, setCurrentSong, setCurrentTime, setIsPlaying } = usePlayerContext();
 
   const [navState, setNavState] = useState(false);
   const [reState, setReState] = useState(false);
@@ -45,7 +45,6 @@ export default function RoomPage() {
   });
   const [isOline, setIsOnline] = useState(false);
   const [users, setUsers] = useState([]);
-  const [programList, setProgramList] = useState([]);
   const [msgList, setMsgList] = useState([]);
 
   const navItemList = [

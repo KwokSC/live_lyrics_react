@@ -20,10 +20,12 @@ import base from "../requests/base.jsx";
 import api from "../requests/api.jsx";
 import RoomUserPanel from "../components/RoomUserPanel.jsx";
 import DanmuScreen from "../components/DanmuScreen.jsx";
+import { usePlayerContext } from "../components/PlayerContext.jsx";
 
 export default function ConsolePage() {
   const navigate = useNavigate();
   const { addErrorMsg } = useGlobalError();
+  const { programList, setProgramList } = usePlayerContext();
   const [roomId, setRoomId] = useState(null);
   const [roomTitle, setTitle] = useState("Room");
   const [isOnline, setIsOnline] = useState(false);
@@ -32,8 +34,6 @@ export default function ConsolePage() {
   const [navState, setNavState] = useState(false);
   const [panelState, setPanelState] = useState(false);
   const [isLyricExpanded, setIsLyricExpanded] = useState(false);
-
-  const [programList, setProgramList] = useState([]);
   const [msgList, setMsgList] = useState([]);
 
   const navItemList = [

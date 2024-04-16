@@ -9,8 +9,8 @@ import { getRoomId } from "../utils/cookie";
 export default function Player({ isSeekable }) {
   const audioRef = useRef();
   const [audio, setAudio] = useState("");
-  const { addErrorMsg } = useGlobalError();
   const {
+    programList,
     currentSong,
     currentTime,
     isPlaying,
@@ -38,9 +38,21 @@ export default function Player({ isSeekable }) {
     }
   }
 
-  function handlePrev() {}
+  function handlePrev() {
+    const currentIndex = programList.findIndex((program)=>program.song.songId === currentSong.songId);
+    if (currentIndex === 0) {
+      return;
+    }
+    changeSong(programList[currentIndex - 1].song);
+  }
 
-  function handleNext() {}
+  function handleNext() {
+    const currentIndex = programList.findIndex((program)=>program.song.songId === currentSong.songId);
+    if (currentIndex === programList.length - 1) {
+      return;
+    }
+    changeSong(programList[currentIndex + 1].song);
+  }
 
   function handleReplay() {
     replay();
@@ -78,7 +90,10 @@ export default function Player({ isSeekable }) {
         <button disabled={!currentSong} onClick={handlePrev}>
           <i className="fi fi-br-angle-double-left"></i>
         </button>
-        <button disabled={!currentSong || currentTime>=currentSong.songDuration} onClick={handlePlay}>
+        <button
+          disabled={!currentSong || currentTime >= currentSong.songDuration}
+          onClick={handlePlay}
+        >
           {isPlaying ? (
             <i className="fi fi-rr-stop"></i>
           ) : (

@@ -11,8 +11,9 @@ const PlayerContext = createContext({
   setIsPlaying: undefined,
   play: undefined,
   pause: undefined,
+  seek: undefined,
   replay: undefined,
-  changeSong: undefined
+  changeSong: undefined,
 });
 
 export const usePlayerContext = () => {
@@ -24,36 +25,45 @@ export const PlayerContextProvider = ({ children }) => {
   const [currentTime, setCurrentTime] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
 
-  function changeSong(song){
-    setCurrentSong(song)
-    setCurrentTime(0)
-    setIsPlaying(false)
+  function changeSong(song) {
+    setCurrentSong(song);
+    setCurrentTime(0);
+    setIsPlaying(false);
+    updatePlayStatus(song, 0, false)
+  }
+
+  function seek(time) {
+    setCurrentTime(time);
+    updatePlayStatus(currentSong, time, isPlaying)
   }
 
   function play() {
     setIsPlaying(true);
+    updatePlayStatus(currentSong, currentTime, true)
   }
 
   function pause() {
     setIsPlaying(false);
+    updatePlayStatus(currentSong, currentTime, false)
   }
 
-  function replay(){
+  function replay() {
     setCurrentTime(0);
     setIsPlaying(false);
+    updatePlayStatus(currentSong, 0, false)
   }
 
-  function updatePlayStatus() {
-    const roomId = getRoomId()
-    if(!roomId){
-        return;
+  function updatePlayStatus(song, time, isPlaying) {
+    const roomId = getRoomId();
+    if (!roomId) {
+      return;
     }
     client.publish({
       destination: `/app/${roomId}/status.update`,
       headers: { Type: "PLAYER" },
       body: JSON.stringify({
-        currentSong: currentSong,
-        currentTime: currentTime,
+        currentSong: song,
+        currentTime: time,
         isPlaying: isPlaying,
       }),
     });
@@ -63,17 +73,19 @@ export const PlayerContextProvider = ({ children }) => {
     let intervalId;
     if (isPlaying) {
       intervalId = setInterval(() => {
-        if (currentTime < currentSong.songDuration) {
-          setCurrentTime((prevTime) => parseInt(prevTime) + 1);
-        } else if (currentTime === currentSong.songDuration) {
-          setIsPlaying(false);
-        }
+        setCurrentTime((prevTime) => parseInt(prevTime) + 1);
       }, 1000);
       return () => {
         clearInterval(intervalId);
       };
     }
   }, [isPlaying]);
+
+  useEffect(() => {
+    if (currentSong && currentTime >= currentSong.songDuration) {
+      setIsPlaying(false);
+    }
+  }, [currentTime]);
 
   return (
     <PlayerContext.Provider
@@ -86,8 +98,9 @@ export const PlayerContextProvider = ({ children }) => {
         setIsPlaying: setIsPlaying,
         play: play,
         pause: pause,
+        seek: seek,
         replay: replay,
-        changeSong: changeSong
+        changeSong: changeSong,
       }}
     >
       {children}

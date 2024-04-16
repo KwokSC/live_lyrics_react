@@ -270,7 +270,7 @@ body {
     color: $secondary-color;
     background-color: $primary-color;
   }
-  button.activated{
+  button.activated {
     color: $secondary-color;
     background-color: $primary-color;
   }
@@ -305,10 +305,10 @@ body {
         transparent
       );
     }
-    li.expanded{
+    li.expanded {
       font-size: 30px;
     }
-    li.expanded.highlight{
+    li.expanded.highlight {
       font-size: 40px;
     }
   }
@@ -387,7 +387,7 @@ body {
     box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.1);
     transition: 0.5s;
 
-    button{
+    button {
       border: none;
       aspect-ratio: 1;
       cursor: pointer;
@@ -438,11 +438,11 @@ body {
         flex-direction: row;
         align-items: center;
         box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.1);
-        background: linear-gradient(200deg, #ffd7de, #c0d9ff);
+        background-color: $secondary-color;
         width: 85%;
         height: 40px;
         border-radius: 15px;
-        color: $secondary-color;
+        color: $primary-color;
         margin-bottom: 5px;
         .profile-img {
           aspect-ratio: 1;
@@ -462,6 +462,10 @@ body {
           margin-left: 5px;
           font-family: "Times New Roman", Times, serif;
         }
+      }
+      .host {
+        background: linear-gradient(200deg, #ffd7de, #c0d9ff);
+        color: $secondary-color;
       }
     }
 
@@ -502,7 +506,7 @@ body {
   }
 }
 
-.danmu-screen{
+.danmu-screen {
   position: absolute;
   padding-top: 10vh;
   width: 100vw;
@@ -510,7 +514,7 @@ body {
   overflow: hidden;
   z-index: 2;
   pointer-events: none;
-  .chat-message{
+  .chat-message {
     display: flex;
     flex-direction: row;
     align-items: center;
@@ -522,9 +526,9 @@ body {
     height: 40px;
     padding-inline: 10px;
     border-radius: 10px;
-    p{
+    p {
       font-size: large;
-      font-family: Georgia, 'Times New Roman', Times, serif;
+      font-family: Georgia, "Times New Roman", Times, serif;
     }
   }
 }
@@ -564,7 +568,7 @@ body {
     transition: 0.5s;
     letter-spacing: 1px;
   }
-  i{
+  i {
     margin-top: 5px;
     color: $secondary-color;
     text-align: center;

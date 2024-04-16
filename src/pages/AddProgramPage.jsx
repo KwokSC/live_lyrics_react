@@ -28,9 +28,8 @@ export default function AddProgramPage() {
   const [songAlbum, setSongAlbum] = useState("");
   const [songDuration, setDuration] = useState(0);
   const [albumCover, setAlbumCover] = useState(null);
-  const [imgType, setImgType] = useState("");
+  const [img, setImg] = useState(null);
   const [audio, setAudio] = useState(null);
-  const [audioType, setAudioType] = useState("");
   const [lyricList, setLyricList] = useState([]);
   const [recommendationList, setRecommendationList] = useState([]);
   const statusTextRef = useRef();
@@ -63,28 +62,6 @@ export default function AddProgramPage() {
     </>
   );
 
-  function transformFile(file, filePrefix, type) {
-    if (!file) {
-      return null;
-    }
-    const formData = new FormData();
-    const blob = new Blob([file], { type: type });
-    formData.append(filePrefix, blob, filePrefix + "_" + newProgramId);
-    return formData;
-  }
-
-  function transformLyrics(lyrics) {
-    const formData = new FormData();
-    lyrics.forEach((item) => {
-      if (!item.file) {
-        return;
-      }
-      const blob = new Blob([item.file], { type: "text/plain" });
-      formData.append("lyric", blob, "lyric_" + item.lang + "_" + newProgramId);
-    });
-    return formData;
-  }
-
   async function uploadSong() {
     const song = {
       songId: "song_" + newProgramId,
@@ -109,24 +86,46 @@ export default function AddProgramPage() {
   }
 
   async function uploadImg() {
-    const imgFormData = transformFile(albumCover, "album", imgType);
-    return api.post("/song/uploadAlbumCover", imgFormData);
+    const formData = new FormData();
+    formData.append("album", img);
+    return api.post("/song/uploadAlbumCover", formData);
   }
 
   async function uploadAudio() {
-    const audioFormData = transformFile(audio, "audio", audioType);
-    return api.post("/song/uploadAudio", audioFormData);
+    const formData = new FormData();
+    formData.append("audio", audio);
+    return api.post("/song/uploadAudio", formData);
   }
 
   async function uploadLyric() {
-    const lyricFormData = transformLyrics(lyricList);
-    return api.post("/song/uploadLyric", lyricFormData);
+    const formData = new FormData();
+    lyricList.map((lyric) => {
+      const lyricObject = renameLyric(lyric.file, lyric.lang);
+      formData.append("lyric", lyricObject);
+    });
+    return api.post("/song/uploadLyric", formData);
   }
 
   function validateForm() {
     let result = true;
     if (!audio) {
       addErrorMsg("Please upload audio file.");
+      result = false;
+    }
+
+    if (!songName) {
+      addErrorMsg("Please input song name.");
+      result = false;
+    }
+
+    if (!songAlbum) {
+      addErrorMsg("Please input album name.");
+      result = false;
+    }
+
+    if (!songArtist) {
+      addErrorMsg("Please input artist name.");
+      result = false;
     }
 
     lyricList.forEach((item) => {
@@ -218,6 +217,11 @@ export default function AddProgramPage() {
   }
 
   async function handleSubmitAsync() {
+    if (!validateForm()) {
+      return;
+    }
+
+    setProgress(0);
     setIsOpen(true);
     setIsUploading(true);
 
@@ -246,6 +250,7 @@ export default function AddProgramPage() {
       if (lyricResponse.status === 200) {
         setProgress((prevProgress) => prevProgress + 1);
       }
+
     } catch (error) {
       console.error(error);
     }
@@ -279,7 +284,7 @@ export default function AddProgramPage() {
 
   function handleAddNewLang() {
     const updatedList = [...lyricList];
-    updatedList.push({ lang: "", file: "" });
+    updatedList.push({ lang: "", file: null });
     setLyricList(updatedList);
   }
 
@@ -310,7 +315,11 @@ export default function AddProgramPage() {
   function handleAlbumSelect(event) {
     const file = event.target.files[0];
     if (!file) return;
-    setImgType(file.type);
+    const fileObject = new File([file], "album_" + newProgramId, {
+      type: file.type,
+    });
+    setImg(fileObject);
+
     const reader = new FileReader();
     reader.onload = function (event) {
       setAlbumCover(event.target.result);
@@ -321,30 +330,31 @@ export default function AddProgramPage() {
   function handleAudioSelect(event) {
     const file = event.target.files[0];
     if (!file) return;
-    setAudioType(file.type);
+    const fileObject = new File([file], "audio_" + newProgramId, {
+      type: file.type,
+    });
+    setAudio(fileObject);
+
     const audio = new Audio();
     audio.src = URL.createObjectURL(file);
     audio.addEventListener("loadedmetadata", () => {
       const durationInSeconds = parseInt(audio.duration);
       setDuration(durationInSeconds);
     });
-    const reader = new FileReader();
-    reader.onload = function (event) {
-      setAudio(event.target.result);
-    };
-    reader.readAsDataURL(file);
   }
 
   function handleLyricSelect(event, index) {
     const file = event.target.files[0];
     if (!file) return;
-    const reader = new FileReader();
-    reader.onload = function (event) {
-      const updatedList = [...lyricList];
-      updatedList[index].file = event.target.result;
-      setLyricList(updatedList);
-    };
-    reader.readAsDataURL(file);
+    const updatedList = [...lyricList];
+    updatedList[index].file = file;
+    setLyricList(updatedList);
+  }
+
+  function renameLyric(file, lang) {
+    return new File([file], "lyric_" + lang + "_" + newProgramId, {
+      type: file.type,
+    });
   }
 
   useEffect(() => {
@@ -369,6 +379,12 @@ export default function AddProgramPage() {
     }
     setNewId(uuidv4().slice(0, 12));
   }, []);
+
+  useEffect(()=>{
+    if(isUploading){
+      statusTextRef.current.innerText = "Uploading..."
+    }
+  },[isUploading])
 
   return (
     <div className="add-program-page">

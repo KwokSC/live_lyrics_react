@@ -25,7 +25,7 @@ import { usePlayerContext } from "../components/PlayerContext.jsx";
 export default function ConsolePage() {
   const navigate = useNavigate();
   const { addErrorMsg } = useGlobalError();
-  const { programList, setProgramList } = usePlayerContext();
+  const { setCurrentSong, setCurrentTime, setIsPlaying, programList, setProgramList } = usePlayerContext();
   const [roomId, setRoomId] = useState(null);
   const [roomTitle, setTitle] = useState("Room");
   const [isOnline, setIsOnline] = useState(false);
@@ -138,7 +138,9 @@ export default function ConsolePage() {
       .then((response) => {
         const newPlayStatus = response.data.data;
         if (newPlayStatus) {
-          //TODO
+          setCurrentSong(newPlayStatus.currentSong);
+          setCurrentTime(newPlayStatus.currentTime);
+          setIsPlaying(newPlayStatus.isPlaying);
         }
       })
       .catch((error) => {

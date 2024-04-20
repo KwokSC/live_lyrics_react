@@ -23,6 +23,7 @@ import base from "../requests/base.jsx";
 import DonationWindow from "../components/DonationWindow.jsx";
 import RoomUserPanel from "../components/RoomUserPanel.jsx";
 import DanmuScreen from "../components/DanmuScreen.jsx";
+import { StompHeaders } from "@stomp/stompjs";
 
 export default function RoomPage() {
   const navigate = useNavigate();

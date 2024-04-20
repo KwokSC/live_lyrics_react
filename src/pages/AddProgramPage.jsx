@@ -227,37 +227,44 @@ export default function AddProgramPage() {
     setIsOpen(true);
     setIsUploading(true);
 
+    let tempProgress = 0;
+
     try {
       const songResponse = await uploadSong();
       if (songResponse.status === 200) {
         setProgress((prevProgress) => prevProgress + 1);
+        tempProgress += 1;
       }
 
       const programResponse = await uploadProgram();
       if (programResponse.status === 200) {
         setProgress((prevProgress) => prevProgress + 1);
+        tempProgress += 1;
       }
 
       const imgResponse = await uploadImg();
       if (imgResponse.status === 200) {
         setProgress((prevProgress) => prevProgress + 1);
+        tempProgress += 1;
       }
 
       const audioResponse = await uploadAudio();
       if (audioResponse.status === 200) {
         setProgress((prevProgress) => prevProgress + 1);
+        tempProgress += 1;
       }
 
       const lyricResponse = await uploadLyric();
       if (lyricResponse.status === 200) {
         setProgress((prevProgress) => prevProgress + 1);
+        tempProgress += 1;
       }
     } catch (error) {
       console.error(error);
     }
     setIsUploading(false);
 
-    if (statusProgressRef.current.value === 5) {
+    if (tempProgress === 5) {
       statusTextRef.current.innerText =
         "Congrats! You new program was uploaded successfully.";
       statusImgRef.current.className = "fi fi-rr-cloud-check";

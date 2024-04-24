@@ -39,7 +39,9 @@ export default function Player({ isSeekable }) {
   }
 
   function handlePrev() {
-    const currentIndex = programList.findIndex((program)=>program.song.songId === currentSong.songId);
+    const currentIndex = programList.findIndex(
+      (program) => program.song.songId === currentSong.songId
+    );
     if (currentIndex === 0) {
       return;
     }
@@ -47,7 +49,9 @@ export default function Player({ isSeekable }) {
   }
 
   function handleNext() {
-    const currentIndex = programList.findIndex((program)=>program.song.songId === currentSong.songId);
+    const currentIndex = programList.findIndex(
+      (program) => program.song.songId === currentSong.songId
+    );
     if (currentIndex === programList.length - 1) {
       return;
     }
@@ -86,30 +90,34 @@ export default function Player({ isSeekable }) {
         handleSeekBarChange={handleSeekBarChange}
       />
       <audio ref={audioRef} src={audio}></audio>
-      <div className={`player-button ${isSeekable ? "" : "hidden"}`}>
-        <button disabled={!currentSong} onClick={handlePrev}>
-          <i className="fi fi-br-angle-double-left"></i>
-        </button>
-        <button
-          disabled={!currentSong || currentTime >= currentSong.songDuration}
-          onClick={handlePlay}
-        >
-          {isPlaying ? (
-            <i className="fi fi-rr-stop"></i>
-          ) : (
-            <i className="fi fi-rr-play"></i>
-          )}
-        </button>
-        <button disabled={!currentSong} onClick={handleNext}>
-          <i className="fi fi-br-angle-double-right"></i>
-        </button>
-        <button disabled={!currentSong} onClick={handleReplay}>
-          <i className="fi fi-br-r"></i>
-        </button>
-        <button onClick={handleEndLive}>
-          <i className="fi fi-sr-exit"></i>
-        </button>
-      </div>
+      {isSeekable ? (
+        <div className="player-button">
+          <button disabled={!currentSong} onClick={handlePrev}>
+            <i className="fi fi-br-angle-double-left"></i>
+          </button>
+          <button
+            disabled={!currentSong || currentTime >= currentSong.songDuration}
+            onClick={handlePlay}
+          >
+            {isPlaying ? (
+              <i className="fi fi-rr-stop"></i>
+            ) : (
+              <i className="fi fi-rr-play"></i>
+            )}
+          </button>
+          <button disabled={!currentSong} onClick={handleNext}>
+            <i className="fi fi-br-angle-double-right"></i>
+          </button>
+          <button disabled={!currentSong} onClick={handleReplay}>
+            <i className="fi fi-br-r"></i>
+          </button>
+          <button onClick={handleEndLive}>
+            <i className="fi fi-sr-exit"></i>
+          </button>
+        </div>
+      ) : (
+        <></>
+      )}
     </div>
   );
 }

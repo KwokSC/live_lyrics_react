@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import base from "../requests/base.jsx";
+import { useGlobalError } from "./GlobalErrorContext.jsx";
 
 export default function CardPayment({
   currentPage,
@@ -7,6 +8,7 @@ export default function CardPayment({
   setDoState,
   setCurrentPage,
 }) {
+  const {addErrorMsg} = useGlobalError()
   const [card, setCard] = useState(null);
   const [payments, setPayments] = useState(null);
   const cardContainerRef = useRef();
@@ -26,7 +28,10 @@ export default function CardPayment({
 
       console.debug("Payment Success", paymentResults);
     } catch (e) {
-      payButtonRef.disabled = false;
+      addErrorMsg("Fail to create payment, please try again.")
+      setTimeout(() => {
+        payButtonRef.current.disabled = false;
+      }, 3000);
       displayPaymentResults("FAILURE");
       console.error(e.message);
     }
@@ -60,6 +65,11 @@ export default function CardPayment({
         }
       })
       .catch((error) => {
+        addErrorMsg("Fail to create payment, please try again.")
+        setTimeout(() => {
+          payButtonRef.current.disabled = false;
+        }, 1000);
+        displayPaymentResults("FAILURE");
         console.error(error);
       });
   }

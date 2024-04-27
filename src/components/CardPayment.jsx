@@ -50,7 +50,7 @@ export default function CardPayment({
       .post("/tip/payment", {
         locationId: process.env.REACT_APP_SQUARE_LOCATION_ID,
         sourceId: token,
-        verificationToken,
+        verificationToken: verificationToken,
         idempotencyKey: window.crypto.randomUUID(),
         amountMoney: {
           amount: money,
@@ -94,14 +94,7 @@ export default function CardPayment({
       billingContact: {
         givenName: "John",
         familyName: "Doe",
-        email: "john.doe@square.example",
-        phone: "3214563987",
-        addressLines: ["123 Main Street", "Apartment 1"],
-        city: "London",
-        state: "LND",
-        countryCode: "GB",
       },
-      currencyCode: "GBP",
       intent: "CHARGE",
     };
 

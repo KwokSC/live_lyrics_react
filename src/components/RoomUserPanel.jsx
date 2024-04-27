@@ -7,7 +7,6 @@ export default function RoomUserPanel({
   users,
   sendMessage,
 }) {
-
   const [chatMsg, setMsg] = useState("");
 
   return (
@@ -26,6 +25,7 @@ export default function RoomUserPanel({
         </div>
         <div className="chat-box">
           <input
+            id="chat-msg"
             value={chatMsg}
             onChange={(e) => {
               setMsg(e.target.value);

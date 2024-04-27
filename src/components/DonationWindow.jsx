@@ -81,6 +81,7 @@ export default function DonationWindow({ doState, setDoState }) {
             10
           </button>
           <input
+            id="custom-tip"
             className={amountSelected === "input" ? "focus" : ""}
             type="number"
             onClick={(e) => {
@@ -108,9 +109,14 @@ export default function DonationWindow({ doState, setDoState }) {
           </button>
         </div>
       </div>
-      <CardPayment currentPage={currentPage} money={donationAmount} setDoState={setDoState} setCurrentPage={setPage}/>
-      <ApplePayment currentPage={currentPage} money={donationAmount}/>
-      <AliPayment currentPage={currentPage} money={donationAmount}/>
+      <CardPayment
+        currentPage={currentPage}
+        money={donationAmount}
+        setDoState={setDoState}
+        setCurrentPage={setPage}
+      />
+      <ApplePayment currentPage={currentPage} money={donationAmount} />
+      <AliPayment currentPage={currentPage} money={donationAmount} />
     </div>
   );
 }

@@ -1,7 +1,8 @@
 import "./ConsolePage.scss";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import HeadBar from "../components/HeadBar.jsx";
+import PopModal from "../components/PopModal.jsx";
 import Overlay from "../components/Overlay.jsx";
 import NavBar from "../components/NavBar.jsx";
 import Player from "../components/Player.jsx";
@@ -25,7 +26,13 @@ import { usePlayerContext } from "../components/PlayerContext.jsx";
 export default function ConsolePage() {
   const navigate = useNavigate();
   const { addErrorMsg } = useGlobalError();
-  const { setCurrentSong, setCurrentTime, setIsPlaying, programList, setProgramList } = usePlayerContext();
+  const {
+    setCurrentSong,
+    setCurrentTime,
+    setIsPlaying,
+    programList,
+    setProgramList,
+  } = usePlayerContext();
   const [roomId, setRoomId] = useState(null);
   const [roomTitle, setTitle] = useState("Room");
   const [isOnline, setIsOnline] = useState(false);
@@ -33,13 +40,26 @@ export default function ConsolePage() {
 
   const [navState, setNavState] = useState(false);
   const [panelState, setPanelState] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [isLyricExpanded, setIsLyricExpanded] = useState(false);
   const [msgList, setMsgList] = useState([]);
 
   const navItemList = [
+    { text: "Programme", onClick: () => navigate("/program") },
     { text: "Profile", onClick: null },
     { text: "Preferences", onClick: null },
   ];
+
+  const endLiveConfirm = (
+    <>
+      <div className="pop-modal" style={{ display: isModalOpen ? "" : "none" }}>
+        <p>{"Are you sure to end live?"}</p>
+        <button onClick={endLive}>Yes</button>
+        <button onClick={() => setIsModalOpen(false)}>Cancel</button>
+      </div>
+      <Overlay isCovered={isModalOpen} onClick={() => setIsModalOpen(false)} />
+    </>
+  );
 
   function onMessageReceived(message) {
     const response = JSON.parse(message.body);
@@ -57,12 +77,59 @@ export default function ConsolePage() {
     setMsgList((prevMsgList) => [...prevMsgList, message]);
   }
 
+  function connectToRoom() {
+    client.onConnect = (frame) => {
+      console.log(frame);
+      client.subscribe(
+        `/topic/${roomId}/public`,
+        (message) => onMessageReceived(message),
+        {
+          UserId: getUserInfo().userAccount,
+        }
+      );
+      client.publish({
+        destination: `/app/${roomId}/user.enter`,
+        headers: {
+          UserId: getUserInfo().userAccount,
+        },
+      });
+    };
+    client.activate();
+  }
+
+  function sendChatMsg(chatMsg) {
+    if (client.connected) {
+      client.publish({
+        destination: `/app/${roomId}/chat`,
+        body: JSON.stringify({
+          sender: getUserInfo().userAccount,
+          content: chatMsg,
+        }),
+      });
+    }
+  }
+
   function startLive() {
     api
       .get("/room/startLive", { params: { roomId: roomId } })
       .then((response) => {
         if (response.data.code === 200) {
           setIsOnline(true);
+        }
+      })
+      .catch((error) => {
+        console.error(error);
+        addErrorMsg("Not connected to the room.");
+      });
+  }
+
+  function endLive() {
+    api
+      .get("/room/endLive", { params: { roomId: roomId } })
+      .then((response) => {
+        if (response.data.code === 200) {
+          setIsOnline(false);
+          setIsModalOpen(false);
         }
       })
       .catch((error) => {
@@ -165,38 +232,6 @@ export default function ConsolePage() {
       });
   }
 
-  function connectToRoom() {
-    client.onConnect = (frame) => {
-      console.log(frame);
-      client.subscribe(
-        `/topic/${roomId}/public`,
-        (message) => onMessageReceived(message),
-        {
-          UserId: getUserInfo().userAccount,
-        }
-      );
-      client.publish({
-        destination: `/app/${roomId}/user.enter`,
-        headers: {
-          UserId: getUserInfo().userAccount,
-        },
-      });
-    };
-    client.activate();
-  }
-
-  function sendMessage(chatMsg) {
-    if (client.connected) {
-      client.publish({
-        destination: `/app/${roomId}/chat`,
-        body: JSON.stringify({
-          sender: getUserInfo().userAccount,
-          content: chatMsg,
-        }),
-      });
-    }
-  }
-
   // The first time the console page is opened, it check if user is login
   // Then it will connect to the websocket server.
   useEffect(() => {
@@ -240,6 +275,7 @@ export default function ConsolePage() {
 
   return (
     <div className="console-page">
+      <PopModal content={endLiveConfirm}/>
       <DanmuScreen messages={msgList} />
       <Overlay
         isCovered={navState}
@@ -254,9 +290,11 @@ export default function ConsolePage() {
         }}
         displayText={roomTitle}
         handleBtnClick={() => {
-          navigate("/program");
+          if(isOnline){
+            setIsModalOpen(true);
+          }
         }}
-        buttonIcon={<i className="fi fi-sr-album"></i>}
+        buttonIcon={<i className="fi fi-sr-leave"></i>}
       />
       <NavBar navState={navState} navItemList={navItemList} />
       <div
@@ -282,7 +320,7 @@ export default function ConsolePage() {
         isExpanded={panelState}
         setIsExpanded={setPanelState}
         users={users}
-        sendMessage={sendMessage}
+        sendMessage={sendChatMsg}
       />
     </div>
   );

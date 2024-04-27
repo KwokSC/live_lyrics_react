@@ -174,7 +174,7 @@ export default function RoomPage() {
     client.activate();
   }
 
-  function sendMessage(chatMsg) {
+  function sendChatMsg(chatMsg) {
     if (client.connected) {
       client.publish({
         destination: `/app/${roomId}/chat`,
@@ -185,9 +185,6 @@ export default function RoomPage() {
       });
     }
   }
-
-  // Everytime a new use enter a room, the app tries to subscribe the room
-  // topic with specific roomId. If connected, subscribe to the room's playStatus
 
   useEffect(() => {
     if (isGuest()) {
@@ -215,14 +212,18 @@ export default function RoomPage() {
   useEffect(() => {
     if (isOline) {
       connectToRoom();
+    }else{
+      
     }
     // eslint-disable-next-line
   }, [isOline]);
 
   useEffect(() => {
-    getRoomByRoomId(roomId);
-    getProgrammeById(roomId);
-    getRoomStatusById(roomId);
+    if(roomId){
+      getRoomByRoomId(roomId);
+      getProgrammeById(roomId);
+      getRoomStatusById(roomId);
+    }
   }, [roomId]);
 
   return (
@@ -263,7 +264,7 @@ export default function RoomPage() {
         isExpanded={panelState}
         setIsExpanded={setPanelState}
         users={users}
-        sendMessage={sendMessage}
+        sendMessage={sendChatMsg}
       />
       <Recommendation
         reState={reState}

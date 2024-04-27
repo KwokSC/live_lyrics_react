@@ -18,23 +18,23 @@ export default function ProgramPage() {
   const navigate = useNavigate();
   const { addErrorMsg } = useGlobalError();
   const [programList, setProgramList] = useState([]);
-  const [modalIsOpen, setModalIsOpen] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [programIdToDelete, setProgramIdToDelete] = useState("");
 
   const deleteConfirm = (
     <>
-      <div className="pop-modal" style={{ display: modalIsOpen ? "" : "none" }}>
+      <div className="pop-modal" style={{ display: isModalOpen ? "" : "none" }}>
         <p>{"Are you sure to delete program" + { programIdToDelete } + "?"}</p>
         <button onClick={confirmDelete}>Yes</button>
-        <button onClick={() => setModalIsOpen(false)}>Cancel</button>
+        <button onClick={() => setIsModalOpen(false)}>Cancel</button>
       </div>
-      <Overlay isCovered={modalIsOpen} onClick={() => setModalIsOpen(false)} />
+      <Overlay isCovered={isModalOpen} onClick={() => setIsModalOpen(false)} />
     </>
   );
 
   function handleDelete(programIdToDelete) {
     setProgramIdToDelete(programIdToDelete);
-    setModalIsOpen(true);
+    setIsModalOpen(true);
   }
 
   function confirmDelete() {
@@ -43,7 +43,7 @@ export default function ProgramPage() {
       (program) => program.programId !== programIdToDelete
     );
     setProgramList(newProgramList);
-    setModalIsOpen(false);
+    setIsModalOpen(false);
   }
 
   useEffect(() => {

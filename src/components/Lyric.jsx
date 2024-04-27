@@ -61,10 +61,19 @@ export default function Lyric({ isExpanded, setIsExpanded }) {
         const lyricItemHeight = lyricItem.offsetHeight;
         const scrollPosition =
           lyricItem.offsetTop - lyricWrapperHeight / 2 + lyricItemHeight / 2;
-        lyricContentRef.current.scrollTo({
-          top: Math.max(0, scrollPosition),
-          behavior: "smooth",
-        });
+        // lyricContentRef.current.scrollTo({
+        //   top: Math.max(0, scrollPosition),
+        //   behavior: "smooth",
+        // });
+        // 使用 scrollTop 设置垂直滚动位置
+        const maxScrollTop = lyricContentRef.current.scrollHeight - lyricWrapperHeight;
+        const newScrollTop = Math.min(
+          maxScrollTop,
+          Math.max(0, scrollPosition)
+        );
+
+        // 滚动到新的 scrollTop
+        lyricContentRef.current.scrollTop = newScrollTop;
       }
     }
   }
@@ -140,10 +149,10 @@ export default function Lyric({ isExpanded, setIsExpanded }) {
       <ul className="lyric-content" ref={lyricContentRef}>
         {lyricContent.map((line, index) => (
           <li
-            className={
-              ([index === getCurrentLyricIndex() ? "highlight" : "",
-              isExpanded ? "expanded" : ""].join(' '))
-            }
+            className={[
+              index === getCurrentLyricIndex() ? "highlight" : "",
+              isExpanded ? "expanded" : "",
+            ].join(" ")}
             key={index}
           >
             {line}

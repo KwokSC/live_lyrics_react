@@ -90,7 +90,7 @@ export default function CardPayment({
   // Required in SCA Mandated Regions: Learn more at https://developer.squareup.com/docs/sca-overview
   async function verifyBuyer(payments, token) {
     const verificationDetails = {
-      amount: "1.00",
+      amount: money,
       billingContact: {
         givenName: "John",
         familyName: "Doe",

@@ -15,6 +15,20 @@ export default function Lyric({ isExpanded, setIsExpanded }) {
   const lyricContentRef = useRef();
   const lyricWrapperRef = useRef();
 
+  function getScrollingElement() {
+    if (document.scrollingElement) {
+      return document.scrollingElement;
+    }
+  
+    const docElement = document.documentElement;
+    const docElementRect = docElement.getBoundingClientRect();
+  
+    return {
+      scrollHeight: Math.ceil(docElementRect.height),
+      scrollTop: Math.abs(docElementRect.top)
+    }
+  }
+
   function reformatLrc(lyricContent) {
     if (lyricContent) {
       const strArr = lyricContent.split("\n");
@@ -61,19 +75,12 @@ export default function Lyric({ isExpanded, setIsExpanded }) {
         const lyricItemHeight = lyricItem.offsetHeight;
         const scrollPosition =
           lyricItem.offsetTop - lyricWrapperHeight / 2 + lyricItemHeight / 2;
-        // lyricContentRef.current.scrollTo({
-        //   top: Math.max(0, scrollPosition),
-        //   behavior: "smooth",
-        // });
-        // 使用 scrollTop 设置垂直滚动位置
-        const maxScrollTop = lyricContentRef.current.scrollHeight - lyricWrapperHeight;
-        const newScrollTop = Math.min(
-          maxScrollTop,
-          Math.max(0, scrollPosition)
-        );
-
-        // 滚动到新的 scrollTop
-        lyricContentRef.current.scrollTop = newScrollTop;
+        // const maxScrollTop = lyricContentRef.current.scrollHeight - lyricWrapperHeight;
+        // const newScrollTop = Math.min(
+        //   maxScrollTop,
+        //   Math.max(0 , scrollPosition)
+        // );
+        lyricContentRef.current.scrollTop = scrollPosition;
       }
     }
   }

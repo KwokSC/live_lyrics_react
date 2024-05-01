@@ -5,12 +5,12 @@ import { useGlobalError } from "./GlobalErrorContext.jsx";
 export default function CardPayment({
   currentPage,
   money,
-  setDoState,
-  setCurrentPage,
+  closeTipWindow
 }) {
-  const {addErrorMsg} = useGlobalError()
+  const { addErrorMsg } = useGlobalError();
   const [card, setCard] = useState(null);
   const [payments, setPayments] = useState(null);
+  const [isProcessing, setIsProcessing] = useState(false);
   const cardContainerRef = useRef();
   const statusContainerRef = useRef();
   const payButtonRef = useRef();
@@ -18,39 +18,25 @@ export default function CardPayment({
   async function handlePaymentMethodSubmission(event) {
     event.preventDefault();
 
-    try {
-      // disable the submit button as we await tokenization and make a payment request.
-      payButtonRef.current.disabled = true;
-      const token = await tokenize(card);
-      const verificationToken = await verifyBuyer(payments, token);
-      const paymentResults = await createPayment(token, verificationToken);
-      displayPaymentResults("SUCCESS");
-
-      console.debug("Payment Success", paymentResults);
-    } catch (e) {
-      addErrorMsg("Fail to create payment, please try again.")
-      setTimeout(() => {
-        payButtonRef.current.disabled = false;
-      }, 3000);
-      displayPaymentResults("FAILURE");
-      console.error(e.message);
-    }
+    const token = await tokenize(card);
+    const paymentResults = await createPayment(token);
   }
 
   async function initializeCard(payments) {
     const card = await payments.card();
     cardContainerRef.current.innerHTML = "";
     await card.attach("#card-container");
-
     return card;
   }
 
-  async function createPayment(token, verificationToken) {
+  async function createPayment(token) {
+    // disable the submit button as we await tokenization and make a payment request.
+    payButtonRef.current.disabled = true;
+    setIsProcessing(true)
     base
       .post("/tip/payment", {
         locationId: process.env.REACT_APP_SQUARE_LOCATION_ID,
         sourceId: token,
-        verificationToken: verificationToken,
         idempotencyKey: window.crypto.randomUUID(),
         amountMoney: {
           amount: money,
@@ -59,16 +45,21 @@ export default function CardPayment({
       })
       .then((response) => {
         if (response.status === 200) {
+          displayPaymentResults("SUCCESS");
+          payButtonRef.current.disabled = false;
+          setIsProcessing(false)
           return response.data.data;
         } else {
           throw new Error(response.data.data);
         }
       })
       .catch((error) => {
-        addErrorMsg("Fail to create payment, please try again.")
+        displayPaymentResults("FAILURE");
+        addErrorMsg("Fail to create payment, please try again.");
         setTimeout(() => {
           payButtonRef.current.disabled = false;
-        }, 1000);
+          setIsProcessing(false)
+        }, 3000);
         displayPaymentResults("FAILURE");
         console.error(error);
       });
@@ -85,24 +76,6 @@ export default function CardPayment({
       }
       throw new Error(errorMessage);
     }
-  }
-
-  // Required in SCA Mandated Regions: Learn more at https://developer.squareup.com/docs/sca-overview
-  async function verifyBuyer(payments, token) {
-    const verificationDetails = {
-      amount: money,
-      billingContact: {
-        givenName: "John",
-        familyName: "Doe",
-      },
-      intent: "CHARGE",
-    };
-
-    const verificationResults = await payments.verifyBuyer(
-      token,
-      verificationDetails
-    );
-    return verificationResults.token;
   }
 
   // status is either SUCCESS or FAILURE;
@@ -157,19 +130,21 @@ export default function CardPayment({
     >
       <div ref={cardContainerRef} id="card-container"></div>
       <div className="donation-button-container">
-        <button ref={payButtonRef} onClick={handlePaymentMethodSubmission}>
-          Confirm
+        <button
+          ref={payButtonRef}
+          onClick={handlePaymentMethodSubmission}
+        >
+          {isProcessing ? <div className="loading-spinner"></div> : "Confirm"}
         </button>
         <button
           onClick={() => {
-            setDoState(false);
-            setCurrentPage("SELECTION");
+            closeTipWindow()
           }}
         >
           Cancel
         </button>
       </div>
-      <div ref={statusContainerRef}></div>
+      <div className="status-container" ref={statusContainerRef}></div>
     </div>
   );
 }

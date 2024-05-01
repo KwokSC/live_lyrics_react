@@ -504,7 +504,7 @@ export default function AddProgramPage() {
           type="text"
           value={songName}
           onChange={(e) => setSongName(e.target.value)}
-        ></input>
+        />
         <p>Album</p>
         <input
           id="album-name"
@@ -529,6 +529,7 @@ export default function AddProgramPage() {
                 onChange={(e) => handleTypeSelectChange(e, index)}
               >
                 <option value="">Type</option>
+                <option value="Image">Image</option>
                 <option value="YouTube">Youtube</option>
                 <option value="Text">Text</option>
               </select>
@@ -536,11 +537,36 @@ export default function AddProgramPage() {
                 <i className="fi fi-rr-trash"></i>
               </button>
             </div>
-            <textarea
-              id={`rec-content-${index}`}
-              value={item.content}
-              onChange={(e) => handleContentChange(e, index)}
-            ></textarea>
+            {item.type === "Image" ? (
+              <>
+                <button
+                  className="img-uploader-button"
+                  onClick={() =>
+                    document.getElementById(`rec-img-${index}`).click()
+                  }
+                >
+                  {item.content ? (
+                    <i className="fi fi-rr-document">
+                      <p>
+                        {
+                          document.getElementById(`rec-img-${index}`).files[0]
+                            .name
+                        }
+                      </p>
+                    </i>
+                  ) : (
+                    <i className="fi fi-rr-upload"></i>
+                  )}
+                  <input id={`rec-img-${index}`} type="file" accept="image/*" />
+                </button>
+              </>
+            ) : (
+              <textarea
+                id={`rec-content-${index}`}
+                value={item.content}
+                onChange={(e) => handleContentChange(e, index)}
+              />
+            )}
           </div>
         ))}
         <button onClick={handleAddNewRecommend}>

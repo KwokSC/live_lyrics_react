@@ -6,9 +6,16 @@ import AliPayment from "./AliPayment.jsx";
 
 export default function DonationWindow({ doState, setDoState }) {
   const [donationAmount, setAmount] = useState(0);
-  const [amountSelected, setAmountSelected] = useState(0);
+  const [amountSelected, setAmountSelected] = useState("");
   const [currentPage, setPage] = useState("SELECTION");
   const GlobalErrorContext = useRef(useGlobalError());
+
+  function closeTipWindow() {
+    setDoState(false);
+    setPage("SELECTION");
+    setAmount(0);
+    setAmountSelected("");
+  }
 
   function handleChangeAmount(type, amount) {
     setAmountSelected(type);
@@ -28,7 +35,7 @@ export default function DonationWindow({ doState, setDoState }) {
   }
 
   return (
-    <div className={`donation-window ${doState ? "active" : "hidden"}`}>
+    <div className={`donation-window ${doState ? "" : "hidden"}`}>
       <button
         style={{
           position: "absolute",
@@ -41,8 +48,7 @@ export default function DonationWindow({ doState, setDoState }) {
         onClick={
           currentPage === "SELECTION"
             ? () => {
-                setDoState(false);
-                setPage("SELECTION");
+                closeTipWindow();
               }
             : () => {
                 setPage("SELECTION");
@@ -63,19 +69,21 @@ export default function DonationWindow({ doState, setDoState }) {
         <div className="amount-selection">
           <button
             className={
-              amountSelected === "button" && donationAmount === 5 ? "focus" : ""
+              amountSelected === "button" && donationAmount === 500
+                ? "focus"
+                : ""
             }
-            onClick={() => handleChangeAmount("button", 5)}
+            onClick={() => handleChangeAmount("button", 500)}
           >
             <i className="fi fi-rr-usd-circle"></i>5
           </button>
           <button
             className={
-              amountSelected === "button" && donationAmount === 10
+              amountSelected === "button" && donationAmount === 1000
                 ? "focus"
                 : ""
             }
-            onClick={() => handleChangeAmount("button", 10)}
+            onClick={() => handleChangeAmount("button", 1000)}
           >
             <i className="fi fi-rr-usd-circle"></i>
             10
@@ -88,7 +96,7 @@ export default function DonationWindow({ doState, setDoState }) {
               setAmount(parseInt(e.target.value));
               handleChangeAmount("input");
             }}
-            onChange={(e) => setAmount(e.target.value)}
+            onChange={(e) => setAmount(parseInt(e.target.value) * 100)}
           />
         </div>
         <div className="payment-type-btn">
@@ -112,8 +120,7 @@ export default function DonationWindow({ doState, setDoState }) {
       <CardPayment
         currentPage={currentPage}
         money={donationAmount}
-        setDoState={setDoState}
-        setCurrentPage={setPage}
+        closeTipWindow={closeTipWindow}
       />
       <ApplePayment currentPage={currentPage} money={donationAmount} />
       <AliPayment currentPage={currentPage} money={donationAmount} />

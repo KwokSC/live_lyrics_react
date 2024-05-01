@@ -131,7 +131,7 @@ export default function RoomPage() {
       .then((response) => {
         const programmeRes = response.data.data;
         if (programmeRes) {
-          setProgramList(programmeRes.programListRes);
+          setProgramList(programmeRes.programList);
         }
       })
       .catch((error) => {
@@ -191,8 +191,8 @@ export default function RoomPage() {
       setGuestInfo();
     }
 
-    getRoomByRoomId(roomId);
     getProgrammeById(roomId);
+    getRoomByRoomId(roomId);
 
     return () => {
       if (client.connected) {
@@ -213,7 +213,7 @@ export default function RoomPage() {
     if (isOline) {
       connectToRoom();
     }else{
-      
+      setCurrentSong(null)
     }
     // eslint-disable-next-line
   }, [isOline]);

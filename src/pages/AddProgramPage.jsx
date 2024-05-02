@@ -32,6 +32,7 @@ export default function AddProgramPage() {
   const [audio, setAudio] = useState(null);
   const [lyricList, setLyricList] = useState([]);
   const [recommendationList, setRecommendationList] = useState([]);
+  const [recImgList, setImgList] = useState([]);
   const statusTextRef = useRef();
   const statusImgRef = useRef();
   const statusProgressRef = useRef();
@@ -87,10 +88,14 @@ export default function AddProgramPage() {
     });
   }
 
-  async function uploadImg() {
+  async function uploadAlbum() {
     const formData = new FormData();
     formData.append("album", img);
     return api.post("/song/uploadAlbumCover", formData);
+  }
+
+  async function uploadImages() {
+    const formData = new FormData();
   }
 
   async function uploadAudio() {
@@ -146,78 +151,6 @@ export default function AddProgramPage() {
     return result;
   }
 
-  function handleSubmit() {
-    if (!validateForm) {
-      return;
-    }
-
-    setIsOpen(true);
-    setIsUploading(true);
-    statusTextRef.current.innerText =
-      "New program is uploading, please do not close the window...";
-    statusImgRef.current.className = "fi fi-rr-cloud-upload";
-
-    const song = {
-      songId: "song_" + newProgramId,
-      songName: songName,
-      songAlbum: songAlbum,
-      songArtist: songArtist,
-      songDuration: songDuration,
-    };
-    const program = {
-      songId: "song_" + newProgramId,
-      recommendations: recommendationList,
-    };
-
-    const formData = new FormData();
-    formData.append("roomId", getRoomId());
-    formData.append("song", JSON.stringify(song));
-    formData.append("program", JSON.stringify(program));
-    if (audio) {
-      const audioBlob = new Blob([audio], { type: audio.type });
-      formData.append("audio", audioBlob, "audio_" + newProgramId);
-    }
-
-    if (albumCover) {
-      const imgBlob = new Blob([albumCover], { type: albumCover.type });
-      formData.append("album", imgBlob, "album_" + newProgramId);
-    }
-
-    if (lyricList.length !== 0) {
-      lyricList.forEach((item) => {
-        if (!item.file) {
-          return;
-        }
-        const blob = new Blob([item.file], { type: "text/plain" });
-        formData.append(
-          "lyric",
-          blob,
-          "lyric_" + item.lang + "_" + newProgramId
-        );
-      });
-    }
-
-    api
-      .post("/song/submit", formData)
-      .then((response) => {
-        if (response.data.code === 200) {
-          statusTextRef.current.innerText =
-            "Congrats! You new program was uploaded successfully.";
-          statusImgRef.current.className = "fi fi-rr-cloud-check";
-          setTimeout(() => {
-            navigate("/program");
-          }, 3000);
-        }
-      })
-      .catch((error) => {
-        setIsUploading(false);
-        statusTextRef.current.innerText =
-          "Sorry we failed to upload the program, please try again.";
-        statusImgRef.current.className = "fi fi-rr-cloud-exclamation";
-        console.error(error);
-      });
-  }
-
   async function handleSubmitAsync() {
     if (!validateForm()) {
       return;
@@ -242,7 +175,7 @@ export default function AddProgramPage() {
         tempProgress += 1;
       }
 
-      const imgResponse = await uploadImg();
+      const imgResponse = await uploadAlbum();
       if (imgResponse.status === 200) {
         setProgress((prevProgress) => prevProgress + 1);
         tempProgress += 1;
@@ -358,6 +291,20 @@ export default function AddProgramPage() {
     updatedList[index].file = file;
     setLyricList(updatedList);
   }
+
+  // function handleImgSelect(event, index) {
+  //   const file = event.target.files[0];
+  //   if (!file) return;
+  //   const fileObject = new File([file], index, {
+  //     type: file.type,
+  //   });
+  //   const updatedList = [...recommendationList];
+  //   const updatedImgList = [...recImgList];
+  //   updatedList[index].content = fileObject.name;
+  //   updatedImgList.push(fileObject);
+  //   setImgList(updatedImgList);
+  //   setRecommendationList(updatedList);
+  // }
 
   function renameLyric(file, lang) {
     return new File([file], "lyric_" + lang + "_" + newProgramId, {
@@ -537,7 +484,7 @@ export default function AddProgramPage() {
                 <i className="fi fi-rr-trash"></i>
               </button>
             </div>
-            {item.type === "Image" ? (
+            {/* {item.type === "Image" ? (
               <>
                 <button
                   className="img-uploader-button"
@@ -546,7 +493,7 @@ export default function AddProgramPage() {
                   }
                 >
                   {item.content ? (
-                    <i className="fi fi-rr-document">
+                    <i className="fi fi-rr-copy-image">
                       <p>
                         {
                           document.getElementById(`rec-img-${index}`).files[0]
@@ -557,7 +504,7 @@ export default function AddProgramPage() {
                   ) : (
                     <i className="fi fi-rr-upload"></i>
                   )}
-                  <input id={`rec-img-${index}`} type="file" accept="image/*" />
+                  <input id={`rec-img-${index}`} type="file" accept="image/*" onClick={(e)=>handleImgSelect(e, index)} />
                 </button>
               </>
             ) : (
@@ -566,7 +513,12 @@ export default function AddProgramPage() {
                 value={item.content}
                 onChange={(e) => handleContentChange(e, index)}
               />
-            )}
+            )} */}
+            <textarea
+              id={`rec-content-${index}`}
+              value={item.content}
+              onChange={(e) => handleContentChange(e, index)}
+            />
           </div>
         ))}
         <button onClick={handleAddNewRecommend}>

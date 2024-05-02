@@ -125,7 +125,7 @@ export default function RoomPage() {
 
   function getProgrammeById(roomId) {
     base
-      .get("/room/getProgrammeById", {
+      .get("/program/getProgrammeById", {
         params: { roomId: roomId },
       })
       .then((response) => {

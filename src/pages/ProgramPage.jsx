@@ -64,7 +64,7 @@ export default function ProgramPage() {
         });
     }
     base
-      .get("/room/getProgrammeById", { params: { roomId: getRoomId() } })
+      .get("/program/getProgrammeById", { params: { roomId: getRoomId() } })
       .then((response) => {
         console.log(response.data);
         if (response.data.data) {

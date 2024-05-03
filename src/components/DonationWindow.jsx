@@ -1,5 +1,6 @@
 import { useRef, useState } from "react";
 import { useGlobalError } from "../components/GlobalErrorContext.jsx";
+import TipSelection from "./TipSelection.jsx";
 import CardPayment from "./CardPayment.jsx";
 import ApplePayment from "./ApplePayment.jsx";
 import AliPayment from "./AliPayment.jsx";
@@ -9,6 +10,34 @@ export default function DonationWindow({ doState, setDoState }) {
   const [amountSelected, setAmountSelected] = useState("");
   const [currentPage, setPage] = useState("SELECTION");
   const GlobalErrorContext = useRef(useGlobalError());
+
+  function display(currentPage) {
+    if (currentPage === "SELECTION") {
+      return (
+        <TipSelection
+          donationAmount={donationAmount}
+          amountSelected={amountSelected}
+          handleChangeAmount={handleChangeAmount}
+          validateAmountAndJump={validateAmountAndJump}
+        />
+      );
+    }
+    if (currentPage === "CARD") {
+      return (
+        <CardPayment
+          currentPage={currentPage}
+          money={donationAmount}
+          closeTipWindow={closeTipWindow}
+        />
+      );
+    }
+    if (currentPage === "APPLEPAY") {
+      return <ApplePayment currentPage={currentPage} money={donationAmount} />;
+    }
+    if (currentPage === "ALIPAY") {
+      return <AliPayment money={money} />;
+    }
+  }
 
   function closeTipWindow() {
     setDoState(false);
@@ -35,7 +64,7 @@ export default function DonationWindow({ doState, setDoState }) {
   }
 
   return (
-    <div className={`donation-window ${doState ? "" : "hidden"}`}>
+    <div className="donation-window">
       <button
         style={{
           position: "absolute",
@@ -61,69 +90,7 @@ export default function DonationWindow({ doState, setDoState }) {
           <i className="fi fi-rr-angle-left"></i>
         )}
       </button>
-      <div
-        className="tip-container"
-        style={{ display: currentPage === "SELECTION" ? "" : "none" }}
-      >
-        <p>Thanks for your support</p>
-        <div className="amount-selection">
-          <button
-            className={
-              amountSelected === "button" && donationAmount === 500
-                ? "focus"
-                : ""
-            }
-            onClick={() => handleChangeAmount("button", 500)}
-          >
-            <i className="fi fi-rr-usd-circle"></i>5
-          </button>
-          <button
-            className={
-              amountSelected === "button" && donationAmount === 1000
-                ? "focus"
-                : ""
-            }
-            onClick={() => handleChangeAmount("button", 1000)}
-          >
-            <i className="fi fi-rr-usd-circle"></i>
-            10
-          </button>
-          <input
-            id="custom-tip"
-            className={amountSelected === "input" ? "focus" : ""}
-            type="number"
-            onClick={(e) => {
-              setAmount(parseInt(e.target.value));
-              handleChangeAmount("input");
-            }}
-            onChange={(e) => setAmount(parseInt(e.target.value) * 100)}
-          />
-        </div>
-        <div className="payment-type-btn">
-          <button onClick={() => validateAmountAndJump("CARD")}>
-            <i className="fi fi-rr-credit-card"></i>
-          </button>
-          <button
-            style={{ fontSize: "35px" }}
-            onClick={() => validateAmountAndJump("APPLEPAY")}
-          >
-            <i className="fi fi-brands-apple-pay"></i>
-          </button>
-          <button
-            style={{ fontSize: "25px" }}
-            onClick={() => validateAmountAndJump("ALIPAY")}
-          >
-            <i className="fa-brands fa-alipay"></i>
-          </button>
-        </div>
-      </div>
-      <CardPayment
-        currentPage={currentPage}
-        money={donationAmount}
-        closeTipWindow={closeTipWindow}
-      />
-      <ApplePayment currentPage={currentPage} money={donationAmount} />
-      <AliPayment currentPage={currentPage} money={donationAmount} />
+      {display(currentPage)}
     </div>
   );
 }

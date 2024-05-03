@@ -8,7 +8,7 @@ export default function SongInfo({ isLyricExpanded }) {
 
   function getAlbumCoverById(id) {
     base
-      .get("/song/getAlbumCoverById", { params: { songId: id } })
+      .get("/program/getAlbumCoverById", { params: { songId: id } })
       .then((response) => {
         const newUrl = response.data.data;
         setUrl(newUrl);

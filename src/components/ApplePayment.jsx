@@ -1,7 +1,7 @@
 import { useRef, useState, useEffect } from "react";
 import { useGlobalError } from "./GlobalErrorContext";
 
-export default function ApplePayment({ currentPage, money }) {
+export default function ApplePayment({ money }) {
   const { addErrorMsg } = useGlobalError();
   const statusContainerRef = useRef();
   const payButtonRef = useRef();
@@ -139,7 +139,6 @@ export default function ApplePayment({ currentPage, money }) {
   return (
     <div
       className="tip-container"
-      style={{ display: currentPage === "APPLEPAY" ? "" : "none" }}
     >
       <div
         className="apple-pay-button"

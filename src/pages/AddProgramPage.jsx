@@ -91,7 +91,7 @@ export default function AddProgramPage() {
   async function uploadAlbum() {
     const formData = new FormData();
     formData.append("album", img);
-    return api.post("/song/uploadAlbumCover", formData);
+    return api.post("/program/uploadAlbumCover", formData);
   }
 
   async function uploadImages() {
@@ -101,7 +101,7 @@ export default function AddProgramPage() {
   async function uploadAudio() {
     const formData = new FormData();
     formData.append("audio", audio);
-    return api.post("/song/uploadAudio", formData);
+    return api.post("/program/uploadAudio", formData);
   }
 
   async function uploadLyric() {
@@ -110,7 +110,7 @@ export default function AddProgramPage() {
       const lyricObject = renameLyric(lyric.file, lyric.lang);
       formData.append("lyric", lyricObject);
     });
-    return api.post("/song/uploadLyric", formData);
+    return api.post("/program/uploadLyric", formData);
   }
 
   function validateForm() {

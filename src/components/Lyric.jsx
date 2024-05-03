@@ -15,20 +15,6 @@ export default function Lyric({ isExpanded, setIsExpanded }) {
   const lyricContentRef = useRef();
   const lyricWrapperRef = useRef();
 
-  function getScrollingElement() {
-    if (document.scrollingElement) {
-      return document.scrollingElement;
-    }
-  
-    const docElement = document.documentElement;
-    const docElementRect = docElement.getBoundingClientRect();
-  
-    return {
-      scrollHeight: Math.ceil(docElementRect.height),
-      scrollTop: Math.abs(docElementRect.top)
-    }
-  }
-
   function reformatLrc(lyricContent) {
     if (lyricContent) {
       const strArr = lyricContent.split("\n");
@@ -87,7 +73,7 @@ export default function Lyric({ isExpanded, setIsExpanded }) {
 
   function getLyricsById(id) {
     base
-      .get("/song/getLyricsById", { params: { songId: id } })
+      .get("/program/getLyricsById", { params: { songId: id } })
       .then((response) => {
         const newLyricList = response.data.data;
         if (newLyricList) {

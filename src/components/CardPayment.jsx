@@ -2,18 +2,14 @@ import { useState, useRef, useEffect } from "react";
 import base from "../requests/base.jsx";
 import { useGlobalError } from "./GlobalErrorContext.jsx";
 
-export default function CardPayment({
-  currentPage,
-  money,
-  closeTipWindow
-}) {
+export default function CardPayment({ money, closeTipWindow }) {
   const { addErrorMsg } = useGlobalError();
   const [card, setCard] = useState(null);
-  const [payments, setPayments] = useState(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const cardContainerRef = useRef();
-  const statusContainerRef = useRef();
+  const buttonContainerRef = useRef();
   const payButtonRef = useRef();
+  const statusContainerRef = useRef();
 
   async function handlePaymentMethodSubmission(event) {
     event.preventDefault();
@@ -32,7 +28,7 @@ export default function CardPayment({
   async function createPayment(token) {
     // disable the submit button as we await tokenization and make a payment request.
     payButtonRef.current.disabled = true;
-    setIsProcessing(true)
+    setIsProcessing(true);
     base
       .post("/tip/payment", {
         locationId: process.env.REACT_APP_SQUARE_LOCATION_ID,
@@ -46,20 +42,12 @@ export default function CardPayment({
       .then((response) => {
         if (response.status === 200) {
           displayPaymentResults("SUCCESS");
-          payButtonRef.current.disabled = false;
-          setIsProcessing(false)
           return response.data.data;
         } else {
           throw new Error(response.data.data);
         }
       })
       .catch((error) => {
-        displayPaymentResults("FAILURE");
-        addErrorMsg("Fail to create payment, please try again.");
-        setTimeout(() => {
-          payButtonRef.current.disabled = false;
-          setIsProcessing(false)
-        }, 3000);
         displayPaymentResults("FAILURE");
         console.error(error);
       });
@@ -82,11 +70,23 @@ export default function CardPayment({
   function displayPaymentResults(status) {
     const statusContainer = statusContainerRef.current;
     if (status === "SUCCESS") {
+      cardContainerRef.current.style.display = "none";
+      buttonContainerRef.current.style.display = "none";
+      statusContainer.style.display = "";
       statusContainer.classList.remove("is-failure");
       statusContainer.classList.add("is-success");
+      setIsProcessing(false);
+      setTimeout(() => {
+        closeTipWindow()
+      }, 3000);
     } else {
       statusContainer.classList.remove("is-success");
       statusContainer.classList.add("is-failure");
+      addErrorMsg("Fail to create payment, please try again.");
+      setTimeout(() => {
+        payButtonRef.current.disabled = false;
+        setIsProcessing(false);
+      }, 3000);
     }
 
     statusContainer.style.visibility = "visible";
@@ -104,11 +104,12 @@ export default function CardPayment({
       let payments;
       try {
         payments = window.Square.payments(appId, locationId);
-        setPayments(payments);
       } catch {
         const statusContainer = statusContainerRef.current;
+        statusContainer.style.display = "";
         statusContainer.className = "missing-credentials";
         statusContainer.style.visibility = "visible";
+        addErrorMsg("Payment not available now. Please try again.");
         return;
       }
 
@@ -124,27 +125,25 @@ export default function CardPayment({
   }, []);
 
   return (
-    <div
-      className="tip-container"
-      style={{ display: currentPage === "CARD" ? "" : "none" }}
-    >
+    <div className="tip-container">
       <div ref={cardContainerRef} id="card-container"></div>
-      <div className="donation-button-container">
-        <button
-          ref={payButtonRef}
-          onClick={handlePaymentMethodSubmission}
-        >
+      <div className="donation-button-container" ref={buttonContainerRef}>
+        <button ref={payButtonRef} onClick={handlePaymentMethodSubmission}>
           {isProcessing ? <div className="loading-spinner"></div> : "Confirm"}
         </button>
         <button
           onClick={() => {
-            closeTipWindow()
+            closeTipWindow();
           }}
         >
           Cancel
         </button>
       </div>
-      <div className="status-container" ref={statusContainerRef}></div>
+      <div
+        className="payment-status-container"
+        ref={statusContainerRef}
+        style={{ display: "none" }}
+      />
     </div>
   );
 }

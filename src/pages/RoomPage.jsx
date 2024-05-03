@@ -28,7 +28,8 @@ export default function RoomPage() {
   const navigate = useNavigate();
   const { roomId } = useParams();
   const { addErrorMsg } = useGlobalError();
-  const { setProgramList, setCurrentSong, setCurrentTime, setIsPlaying } = usePlayerContext();
+  const { setProgramList, setCurrentSong, setCurrentTime, setIsPlaying } =
+    usePlayerContext();
 
   const [navState, setNavState] = useState(false);
   const [reState, setReState] = useState(false);
@@ -211,14 +212,14 @@ export default function RoomPage() {
   useEffect(() => {
     if (isOline) {
       connectToRoom();
-    }else{
-      setCurrentSong(null)
+    } else {
+      setCurrentSong(null);
     }
     // eslint-disable-next-line
   }, [isOline]);
 
   useEffect(() => {
-    if(roomId){
+    if (roomId) {
       getRoomByRoomId(roomId);
       getProgrammeById(roomId);
       getRoomStatusById(roomId);
@@ -255,7 +256,7 @@ export default function RoomPage() {
         profileImg={hostInfo.profileImg}
         summary={hostInfo.summary}
       />
-      <DonationWindow doState={doState} setDoState={setDoState} />
+      {doState && <DonationWindow doState={doState} setDoState={setDoState} />}
       <SongInfo isLyricExpanded={isLyricExpanded} />
       <SeekBar isSeekable={false} />
       <Lyric isExpanded={isLyricExpanded} setIsExpanded={setIsLyricExpanded} />

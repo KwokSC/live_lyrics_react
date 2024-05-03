@@ -73,7 +73,7 @@ export default function Player({ isSeekable }) {
       return;
     }
     base
-      .get("/song/getAudioById", { params: { songId: currentSong.songId } })
+      .get("/program/getAudioById", { params: { songId: currentSong.songId } })
       .then((response) => {
         const newAudio = response.data.data;
         setAudio(newAudio);

@@ -7,6 +7,7 @@ export default defineConfig(({ mode }) => {
   return {
     define: {
       global: {},
+      'process.env.REACT_APP_SQUARE_ENDPOINT': JSON.stringify(env.REACT_APP_SQUARE_ENDPOINT),
       'process.env.REACT_APP_HTTP_ENDPOINT': JSON.stringify(env.REACT_APP_HTTP_ENDPOINT),
       'process.env.REACT_APP_WS_ENDPOINT' : JSON.stringify(env.REACT_APP_WS_ENDPOINT),
       'process.env.REACT_APP_SQUARE_APP_ID': JSON.stringify(env.REACT_APP_SQUARE_APP_ID),

@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useGlobalError } from "../components/GlobalErrorContext.jsx";
 import TipSelection from "./TipSelection.jsx";
 import CardPayment from "./CardPayment.jsx";
@@ -62,6 +62,13 @@ export default function DonationWindow({ doState, setDoState }) {
       );
     }
   }
+
+  useEffect(() => {
+    const scriptSrc = process.env.REACT_APP_SQUARE_ENDPOINT;
+    const scriptElement = document.createElement("script");
+    scriptElement.src = scriptSrc;
+    document.body.appendChild(scriptElement);
+  }, []);
 
   return (
     <div className="donation-window">

@@ -36,7 +36,7 @@ export default function Recommendation({ reState, onReClick }) {
   }
 
   useEffect(() => {
-    if (!currentSong || !programList) {
+    if (!currentSong || programList.length === 0) {
       return;
     }
     setContentList(
@@ -44,6 +44,13 @@ export default function Recommendation({ reState, onReClick }) {
         .recommendations
     );
   }, [currentSong, programList]);
+
+  useEffect(()=>{
+    const links = document.querySelectorAll('a');
+      links.forEach(link => {
+        link.setAttribute('target', '_blank');
+      });
+  },[contentList])
 
   return (
     <div className={`recommendation ${reState ? "active" : "hidden"}`}>

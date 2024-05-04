@@ -13,7 +13,7 @@ export default function ApplePayment({ money }) {
       countryCode: "AU",
       currencyCode: "AUD",
       total: {
-        amount: money.toString(),
+        amount: (money / 100).toFixed(2).toString(),
         label: "Total",
       },
     });
@@ -25,7 +25,7 @@ export default function ApplePayment({ money }) {
     try {
       // disable the submit button as we await tokenization and make a payment request.
       payButtonRef.current.disabled = true;
-      setIsProcessing(true)
+      setIsProcessing(true);
       const token = await tokenize(applePay);
       const paymentResults = await createPayment(token);
       displayPaymentResults("SUCCESS");
@@ -34,7 +34,7 @@ export default function ApplePayment({ money }) {
     } catch (e) {
       addErrorMsg("Fail to create payment, please try again.");
       setTimeout(() => {
-        setIsProcessing(false)
+        setIsProcessing(false);
         payButtonRef.current.disabled = false;
       }, 3000);
       displayPaymentResults("FAILURE");
@@ -61,7 +61,7 @@ export default function ApplePayment({ money }) {
       })
       .then((response) => {
         if (response.status === 200) {
-          setIsProcessing(false)
+          setIsProcessing(false);
           return response.data.data;
         } else {
           throw new Error(response.data.data);
@@ -69,10 +69,6 @@ export default function ApplePayment({ money }) {
       })
       .catch((error) => {
         addErrorMsg("Fail to create payment, please try again.");
-        setTimeout(() => {
-          setIsProcessing(false)
-          payButtonRef.current.disabled = false;
-        }, 3000);
         displayPaymentResults("FAILURE");
         console.error(error);
       });
@@ -95,11 +91,21 @@ export default function ApplePayment({ money }) {
   function displayPaymentResults(status) {
     const statusContainer = statusContainerRef.current;
     if (status === "SUCCESS") {
+      payButtonRef.current.style.display = "none";
+      statusContainer.style.display = "";
       statusContainer.classList.remove("is-failure");
       statusContainer.classList.add("is-success");
+      setIsProcessing(false);
+      setTimeout(() => {
+        closeTipWindow()
+      }, 3000);
     } else {
       statusContainer.classList.remove("is-success");
       statusContainer.classList.add("is-failure");
+      setTimeout(() => {
+        setIsProcessing(false);
+        payButtonRef.current.disabled = false;
+      }, 3000);
     }
 
     statusContainer.style.visibility = "visible";
@@ -137,9 +143,7 @@ export default function ApplePayment({ money }) {
   }, []);
 
   return (
-    <div
-      className="tip-container"
-    >
+    <div className="tip-container">
       <div
         className="apple-pay-button"
         ref={payButtonRef}
@@ -151,7 +155,11 @@ export default function ApplePayment({ money }) {
           <i className="fi fi-brands-apple-pay"></i>
         )}
       </div>
-      <div ref={statusContainerRef}></div>
+      <div
+        className="payment-status-container"
+        ref={statusContainerRef}
+        style={{ display: "none" }}
+      ></div>
     </div>
   );
 }

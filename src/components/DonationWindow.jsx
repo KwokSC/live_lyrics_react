@@ -25,14 +25,13 @@ export default function DonationWindow({ doState, setDoState }) {
     if (currentPage === "CARD") {
       return (
         <CardPayment
-          currentPage={currentPage}
           money={donationAmount}
           closeTipWindow={closeTipWindow}
         />
       );
     }
     if (currentPage === "APPLEPAY") {
-      return <ApplePayment currentPage={currentPage} money={donationAmount} />;
+      return <ApplePayment money={donationAmount} />;
     }
     if (currentPage === "ALIPAY") {
       return <AliPayment money={money} />;

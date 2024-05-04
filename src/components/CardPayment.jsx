@@ -48,6 +48,7 @@ export default function CardPayment({ money, closeTipWindow }) {
         }
       })
       .catch((error) => {
+        addErrorMsg("Fail to create payment, please try again.");
         displayPaymentResults("FAILURE");
         console.error(error);
       });
@@ -82,7 +83,6 @@ export default function CardPayment({ money, closeTipWindow }) {
     } else {
       statusContainer.classList.remove("is-success");
       statusContainer.classList.add("is-failure");
-      addErrorMsg("Fail to create payment, please try again.");
       setTimeout(() => {
         payButtonRef.current.disabled = false;
         setIsProcessing(false);

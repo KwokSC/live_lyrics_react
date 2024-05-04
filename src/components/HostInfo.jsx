@@ -4,6 +4,8 @@ export default function HostInfo({
   profileImg,
   hostName,
   summary,
+  instagram,
+  tiktok,
 }) {
   return (
     <div className={`host-info ${hoState ? "active" : "hidden"}`}>
@@ -12,15 +14,23 @@ export default function HostInfo({
         {hostName}
       </p>
       <div className="social-media">
-        <button>
+        <a
+          href={"https://www.instagram.com/" + instagram}
+          target="_blank"
+          rel="noopener noreferrer"
+        >
           <i className="fi fi-brands-instagram"></i>
-        </button>
-        <button>
+        </a>
+        <a>
           <i className="fi fi-brands-twitter-alt-circle"></i>
-        </button>
-        <button>
+        </a>
+        <a
+          href={"https://www.tiktok.com/@" + tiktok}
+          target="_blank"
+          rel="noopener noreferrer"
+        >
           <i className="fi fi-brands-tik-tok"></i>
-        </button>
+        </a>
       </div>
       <p style={{ fontStyle: "italic", marginTop: "10px" }}>
         {"'" + summary + "'"}

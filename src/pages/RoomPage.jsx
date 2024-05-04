@@ -255,6 +255,8 @@ export default function RoomPage() {
         hostName={hostInfo.userName}
         profileImg={hostInfo.profileImg}
         summary={hostInfo.summary}
+        instagram={hostInfo.instagram}
+        tiktok={hostInfo.tiktok}
       />
       {doState && <DonationWindow doState={doState} setDoState={setDoState} />}
       <SongInfo isLyricExpanded={isLyricExpanded} />

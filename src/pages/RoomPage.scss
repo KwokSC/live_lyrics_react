@@ -209,18 +209,21 @@
     justify-content: center;
     height: 30px;
     margin-top: 10px;
-    button {
+    a {
       aspect-ratio: 1;
-      width: 40px;
-      background-color: transparent;
+      width: 30px;
       margin-inline: 5px;
+      background-color: transparent;
       color: $secondary-color;
       border: none;
       border-radius: 50%;
       font-size: 25px;
       cursor: pointer;
+      transition: 0.5s;
+      text-align: center;
+      text-decoration: none;
     }
-    button:hover {
+    a:hover {
       text-shadow: 0 0 10px $secondary-color;
     }
   }

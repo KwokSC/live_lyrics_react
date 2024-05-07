@@ -5,7 +5,7 @@ import CardPayment from "./CardPayment.jsx";
 import ApplePayment from "./ApplePayment.jsx";
 import AliPayment from "./AliPayment.jsx";
 
-export default function DonationWindow({ doState, setDoState }) {
+export default function DonationWindow({ setDoState }) {
   const [donationAmount, setAmount] = useState(0);
   const [amountSelected, setAmountSelected] = useState("");
   const [currentPage, setPage] = useState("SELECTION");
@@ -34,7 +34,7 @@ export default function DonationWindow({ doState, setDoState }) {
       return <ApplePayment money={donationAmount} />;
     }
     if (currentPage === "ALIPAY") {
-      return <AliPayment money={money} />;
+      return <AliPayment money={donationAmount} />;
     }
   }
 

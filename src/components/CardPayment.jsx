@@ -67,6 +67,10 @@ export default function CardPayment({ money, closeTipWindow }) {
     }
   }
 
+  function broadcastDonation(){
+    
+  }
+
   // status is either SUCCESS or FAILURE;
   function displayPaymentResults(status) {
     const statusContainer = statusContainerRef.current;

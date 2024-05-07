@@ -8,7 +8,7 @@
 body {
   width: 100%;
   height: 100vh;
-  background: linear-gradient(200deg, #f3e7e9, #e3eeff);
+  background: linear-gradient(200deg, $gradient-color-1, $gradient-color-2);
   overflow: hidden;
 }
 

@@ -1,13 +1,16 @@
-import { useState } from "react";
 import "./LoginPage.scss";
+import Overlay from "../components/Overlay.jsx";
+import { useState } from "react";
 import { useGlobalError } from "../components/GlobalErrorContext.jsx";
 import base from "../requests/base.jsx";
 import { setAuthToken, storeUserInfo } from "../utils/cookie.jsx";
 import { useNavigate } from "react-router-dom";
+import RegisterWindow from "../components/RegisterWindow.jsx";
 
 export default function LoginPage() {
   const [userAccount, setAccount] = useState("");
   const [userPassword, setPassword] = useState("");
+  const [isRegisterOpen, setIsOpen] = useState(false);
   const { addErrorMsg } = useGlobalError();
   const navigate = useNavigate();
 
@@ -46,6 +49,8 @@ export default function LoginPage() {
 
   return (
     <div className="login-page">
+      <Overlay isCovered={isRegisterOpen} onClick={()=>setIsOpen(false)}/>
+      <RegisterWindow isOpen={isRegisterOpen} setIsOpen={setIsOpen}/>
       <form className="login-form" onSubmit={handleLogin}>
         <h1>login</h1>
         <input
@@ -61,6 +66,9 @@ export default function LoginPage() {
           onChange={(e) => setPassword(e.target.value)}
         />
         <button type="submit">Login</button>
+        <button type="button" onClick={()=>{setIsOpen(true);}}>
+          No account? Join us!
+        </button>
       </form>
     </div>
   );

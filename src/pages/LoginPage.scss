@@ -5,18 +5,84 @@
   justify-content: center;
   align-items: center;
   height: 100vh;
-}
-
-.login-form {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  width: min(80vw, 300px);
-  height: 50vh;
-  background-color: $primary-color;
-  border-radius: 20px;
-  box-shadow: 5px 5px 5px rgba(0, 0, 0, 0.1);
+  .register-form{
+    position: absolute;
+    width: 300px;
+    height: 400px;
+    border-radius: 20px;
+    background-color: $secondary-color;
+    z-index: 3;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    button[type="submit"]{
+      background-color: $primary-color;
+      color: $secondary-color;
+    }
+    h1{
+      color: $primary-color;
+    }
+    input {
+      color: $secondary-color;
+      border-bottom: 1px solid rgba(255, 147, 147, 0.673);
+      padding: 5px 0;
+      text-indent: 10px;
+      margin: 5px 0;
+      font-size: 12px;
+    }
+    input::placeholder {
+      color: $primary-color;
+    }
+    input:focus {
+      color: $primary-color;
+      transition: 0.5s;
+    }
+    button[type="button"]{
+      position: absolute;
+      top: 0;
+      right: 0;
+      margin: 5px;
+      border: none;
+      background-color: transparent;
+      aspect-ratio: 1;
+      width: 40px;
+      border-radius: 25%;
+      transition: 0.5s;
+      color: $primary-color;
+      font-size: large;
+    }
+    button[type="button"]:hover{
+      transform: rotate(90deg);
+    }
+  }
+  .login-form {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: min(80vw, 300px);
+    height: 50vh;
+    background-color: $primary-color;
+    border-radius: 20px;
+    box-shadow: 5px 5px 5px rgba(0, 0, 0, 0.1);
+    button{
+      width: 70%;
+      background-color: transparent;
+      outline: none;
+      border-radius: 8px;
+      padding: 13px;
+      color: $secondary-color;
+      letter-spacing: 1px;
+      border: none;
+      cursor: pointer;
+      font-size: 12px;
+      transition: 0.5s;
+    }
+    button:hover{
+      text-decoration: underline;
+    }
+  }
   h1 {
     text-align: center;
     margin-bottom: 25px;
@@ -52,7 +118,7 @@
     border-bottom: 1px solid #ff5a7684;
     transition: 0.5s;
   }
-  button {
+  button[type="submit"] {
     width: 70%;
     margin-top: 35px;
     background-color: #f6f6f6;
@@ -66,7 +132,9 @@
     font-size: 15px;
     transition: 0.5s;
   }
-  button:hover {
+  button[type="submit"]:hover {
     box-shadow: 5px 5px 5px rgba(0, 0, 0, 0.1);
   }
 }
+
+

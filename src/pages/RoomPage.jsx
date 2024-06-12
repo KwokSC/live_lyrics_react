@@ -257,6 +257,7 @@ export default function RoomPage() {
         summary={hostInfo.summary}
         instagram={hostInfo.instagram}
         tiktok={hostInfo.tiktok}
+        youtube={hostInfo.youtube}
       />
       {doState && <DonationWindow doState={doState} setDoState={setDoState} />}
       <SongInfo isLyricExpanded={isLyricExpanded} />

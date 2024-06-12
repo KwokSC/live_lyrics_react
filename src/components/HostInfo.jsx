@@ -5,6 +5,7 @@ export default function HostInfo({
   hostName,
   summary,
   instagram,
+  youtube,
   tiktok,
 }) {
   return (
@@ -21,8 +22,12 @@ export default function HostInfo({
         >
           <i className="fi fi-brands-instagram"></i>
         </a>
-        <a>
-          <i className="fi fi-brands-twitter-alt-circle"></i>
+        <a
+          href={"https://www.youtube.com/@" + youtube}
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <i className="fi fi-brands-youtube"></i>
         </a>
         <a
           href={"https://www.tiktok.com/@" + tiktok}
